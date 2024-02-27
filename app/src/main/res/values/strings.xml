@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Bayzze App</string>
+    <string name="SplashText">Bayzze App</string>
+    <string name="SplashText2">App</string>
+    <string name="subtotal_label">Subtotal: Rp %1$s</string>
+    <string name="delivery_charge_label">Delivery Charge: Rp %1$s</string>
+    <string name="total_label">Total: Rp %1$s</string>
+</resources>

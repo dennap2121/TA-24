@@ -1,0 +1,78 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+xmlns:app="http://schemas.android.com/apk/res-auto">
+
+<!-- Header with title and back button -->
+<RelativeLayout
+    android:id="@+id/headerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:padding="16dp">
+
+    <ImageButton
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/icon_back_green"
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="8dp"
+        android:contentDescription="Back" />
+
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="Kategori"
+        android:fontFamily="@font/poppins"
+        android:textColor="#32647B"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+</RelativeLayout>
+
+<!--&lt;!&ndash; Tabs to display different categories &ndash;&gt;-->
+<!--<com.google.android.material.tabs.TabLayout-->
+<!--    android:id="@+id/tabLayout"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:layout_below="@id/headerLayout"-->
+<!--    android:background="@color/colorPrimary"-->
+<!--    android:padding="8dp"-->
+<!--    app:tabGravity="fill"-->
+<!--    app:tabMode="scrollable" />-->
+
+<!-- Placeholder for displaying category content -->
+<FrameLayout
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_below="@id/headerLayout" />
+
+<!-- RecyclerView to display product cards -->
+<androidx.recyclerview.widget.RecyclerView
+    android:id="@+id/productRecyclerView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_below="@id/headerLayout"/>
+
+    <!-- Floating button -->
+    <Button
+        android:id="@+id/floatingButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:elevation="6dp"
+        android:textAllCaps="false"
+        android:padding="16dp"
+        android:background="@drawable/button_background_circle_green"
+        android:text="Tambahkan (0) produk"
+        android:textColor="@android:color/white" />
+
+</RelativeLayout>

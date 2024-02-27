@@ -1,0 +1,48 @@
+<!-- activity_category.xml -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Tabs to display different categories -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        app:tabGravity="fill"
+        app:tabMode="scrollable" />
+
+    <!-- Placeholder for displaying category content -->
+    <FrameLayout
+        android:background="#D1D1D6"
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/tabLayout" />
+
+    <!-- ImageView as placeholder when RecyclerView data is null -->
+    <ImageView
+        android:id="@+id/emptyStateImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/image_order_nodata"
+        android:layout_centerInParent="true"
+        android:visibility="gone" /> <!-- Initially set to gone -->
+
+    <!-- RecyclerView to display product cards -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/deliveryRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottomNavigationAdminView"
+        android:layout_below="@id/tabLayout"/>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationAdminView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:menu="@menu/bottom_navigation_admin_menu" />
+
+</RelativeLayout>

@@ -1,0 +1,295 @@
+<!-- activity_payment.xml -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="16dp">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_back_green"
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="8dp"
+            android:contentDescription="Back" />
+
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Pembayaran"
+            android:textColor="#32647B"
+            android:fontFamily="@font/poppins"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_below="@id/headerLayout"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:id="@+id/layoutOrderDetails1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@id/titleTextView"
+            android:layout_marginBottom="16dp">
+
+            <!-- Subtotal -->
+            <TextView
+                android:id="@+id/textSubtotalLabel"
+                android:layout_width="0dp"
+                android:textColor="#32647B"
+                android:fontFamily="@font/poppins"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Sub Total"/>
+
+            <TextView
+                android:id="@+id/textSubtotalValue"
+                android:textColor="#32647B"
+                android:fontFamily="@font/poppins"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text=""/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutOrderDetails2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <!-- Delivery Cost -->
+            <TextView
+                android:id="@+id/textDeliveryLabel"
+                android:textColor="#32647B"
+                android:fontFamily="@font/poppins"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Ongkos Kirim"/>
+
+            <TextView
+                android:id="@+id/textDeliveryValue"
+                android:textColor="#32647B"
+                android:fontFamily="@font/poppins"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text=""/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutOrderDetails3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <!-- Total -->
+            <TextView
+                android:id="@+id/textTotalLabel"
+                android:textColor="#32647B"
+                android:fontFamily="@font/poppins"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Total"/>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/textTotalValue"
+                    android:textColor="#32647B"
+                    android:fontFamily="@font/poppins"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""/>
+
+                <ImageView
+                    android:id="@+id/iconCopyTotal"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/icon_copy"
+                    android:layout_toEndOf="@id/textTotalValue"
+                    android:layout_marginStart="8dp"
+                    android:onClick="copyTotal"/>
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <!-- Bank Account Section -->
+        <TextView
+            android:id="@+id/textBankAccount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pembayaran via Bank"
+            android:textColor="#32647B"
+            android:fontFamily="@font/poppins"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_below="@id/layoutOrderDetails3"
+            android:layout_marginTop="16dp"/>
+
+        <!-- Bank Account Details for Mandiri -->
+        <!-- Repeat similar layout for BCA and BRI -->
+        <LinearLayout
+            android:id="@+id/layoutBankAccountMandiri"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_below="@id/textBankAccount"
+            android:layout_marginTop="16dp">
+
+            <ImageView
+                android:id="@+id/imageMandiri"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/mandiri"/>
+
+            <TextView
+                android:id="@+id/textBankAccountMandiri"
+                android:textColor="#32647B"
+                android:fontFamily="@font/poppins"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAlignment="viewEnd"
+                android:text="Mandiri Account Number"/>
+
+            <ImageView
+                android:id="@+id/iconCopyMandiri"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/icon_copy"
+                android:layout_marginStart="8dp"
+                android:onClick="copyBankAccount"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutBankAccountBCA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_below="@id/textBankAccount"
+            android:layout_marginTop="16dp">
+
+            <ImageView
+                android:id="@+id/imageBCA"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/bca"/>
+
+            <TextView
+                android:id="@+id/textBankAccountBCA"
+                android:textColor="#32647B"
+                android:fontFamily="@font/poppins"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAlignment="viewEnd"
+                android:text="BCA Account Number"/>
+
+            <ImageView
+                android:id="@+id/iconCopyBCA"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/icon_copy"
+                android:layout_marginStart="8dp"
+                android:onClick="copyBankAccount"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutBankAccountBRI"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_below="@id/textBankAccount"
+            android:layout_marginTop="16dp">
+
+            <ImageView
+                android:id="@+id/imageBRI"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/bri"/>
+
+            <TextView
+                android:id="@+id/textBankAccountBRI"
+                android:textColor="#32647B"
+                android:fontFamily="@font/poppins"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAlignment="viewEnd"
+                android:text="BRI Account Number"/>
+
+            <ImageView
+                android:id="@+id/iconCopyBRI"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/icon_copy"
+                android:layout_marginStart="8dp"
+                android:onClick="copyBankAccount"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/uploadButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/button_background_circle"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:onClick="uploadImage">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/icon_upload"
+                android:layout_gravity="center_vertical"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Upload bukti pembayaran"
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/poppins"
+                android:textSize="16sp"
+                android:layout_marginStart="8dp"
+                android:layout_gravity="center_vertical"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+
+</RelativeLayout>

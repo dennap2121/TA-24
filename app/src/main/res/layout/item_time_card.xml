@@ -1,0 +1,84 @@
+<!-- item_cart_product.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@drawable/card_background_time"
+    android:layout_marginHorizontal="30dp"
+    android:layout_marginVertical="5dp"
+    android:padding="10dp">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/timeDayTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins"
+                android:textColor="#32647B"
+                android:text="Day" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginLeft="30dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/timeOpenTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins"
+                android:textColor="#32647B"
+                android:layout_marginRight="10dp"
+                android:text="00.00" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins"
+                android:textColor="#32647B"
+                android:text="s/d"/>
+
+            <TextView
+                android:id="@+id/timeCloseTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins"
+                android:textColor="#32647B"
+                android:layout_marginLeft="10dp"
+                android:text="00.00" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

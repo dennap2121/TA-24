@@ -1,0 +1,100 @@
+<!-- confirmation_rejection_popup.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="20dp"
+    android:orientation="vertical">
+
+    <!-- First layer: Title "Konfirmasi Penolakan" -->
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Konfirmasi Penolakan"
+        android:textStyle="bold"
+        android:fontFamily="@font/poppins"
+        android:textColor="@color/red"
+        android:padding="16dp"
+        android:textSize="18sp"/>
+
+    <!-- Second layer: Subtitle "Berikan alasan kenapa anda menolak permintaan pick up ini" -->
+    <TextView
+        android:id="@+id/subtitleTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins"
+        android:textColor="@color/black"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="Berikan alasan kenapa anda menolak permintaan pick up ini"
+        android:textSize="16sp"/>
+
+    <!-- Third layer: Checkbox "Jarak terlalu jauh" -->
+    <CheckBox
+        android:id="@+id/distanceCheckbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Jarak terlalu jauh"
+        android:fontFamily="@font/poppins"
+        android:textColor="@color/black"
+        android:padding="16dp"
+        android:textSize="16sp"/>
+
+    <!-- Fourth layer: Checkbox "Toko Sedang Sibuk" -->
+    <CheckBox
+        android:id="@+id/busyCheckbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Toko sedang sibuk"
+        android:fontFamily="@font/poppins"
+        android:textColor="@color/black"
+        android:padding="16dp"
+        android:textSize="16sp"/>
+
+    <!-- Fifth layer: Checkbox "Toko sedang sibuk" -->
+    <CheckBox
+        android:id="@+id/storeBusyCheckbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Toko sedang tutup"
+        android:padding="16dp"
+        android:fontFamily="@font/poppins"
+        android:textColor="@color/black"
+        android:textSize="16sp"/>
+
+    <!-- Sixth layer: Checkbox "Lainnya" -->
+    <CheckBox
+        android:id="@+id/otherCheckbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Lainnya"
+        android:fontFamily="@font/poppins"
+        android:textColor="@color/black"
+        android:padding="16dp"
+        android:textSize="16sp"/>
+
+    <!-- Seventh layer: Text input -->
+    <EditText
+        android:id="@+id/reasonEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Alasan lainnya"
+        android:fontFamily="@font/poppins"
+        android:textColor="@color/black"
+        android:padding="16dp"
+        android:textSize="16sp"/>
+
+    <!-- Eighth layer: Button "Tolak Permintaan Pengiriman" -->
+    <Button
+        android:id="@+id/rejectButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Tolak Permintaan Pengiriman"
+        android:fontFamily="@font/poppins"
+        android:textColor="#ffffff"
+        android:background="@color/red"
+        android:textSize="16sp"
+        android:padding="12dp"
+        android:gravity="center"/>
+</LinearLayout>

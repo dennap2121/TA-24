@@ -1,0 +1,111 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+
+    <!-- Tabs to display different categories -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp" />
+
+    <!-- Placeholder for displaying category content -->
+    <FrameLayout
+        android:background="#D1D1D6"
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/tabLayout" />
+
+    <!-- ImageView as placeholder when RecyclerView data is null -->
+    <ImageView
+        android:id="@+id/emptyStateImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/image_order_nodata"
+        android:layout_centerInParent="true"
+        android:visibility="gone" /> <!-- Initially set to gone -->
+
+    <!-- Button "Tambah" aligned to the right -->
+    <Button
+        android:id="@+id/btnTambah"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tambah"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/tabLayout"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/header"
+        android:padding="16dp"
+        android:background="@color/grey_font"
+        android:layout_below="@id/btnTambah"
+
+        android:orientation="horizontal">
+
+        <!-- TextViews for header columns -->
+        <TextView
+            android:text="No"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins"
+            android:textColor="@color/black"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:text="Image"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins"
+            android:textColor="@color/black"
+            android:layout_weight="1"
+            android:textSize="16sp"/>
+
+
+        <TextView
+            android:text="Link"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins"
+            android:textColor="@color/black"
+            android:layout_weight="1"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:text="Action"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins"
+            android:textColor="@color/black"
+            android:layout_weight="1"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
+    <!-- RecyclerView for displaying content -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/contentRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/header"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/exportPdf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:src="@drawable/icon_pdf"
+        android:background="@color/primary"
+        android:contentDescription="Export PDF"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp" />
+
+</RelativeLayout>

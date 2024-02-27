@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Header -->
+    <RelativeLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="16dp">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_back_green"
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="8dp"
+            android:contentDescription="Back" />
+
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Detail Pemesanan"
+            android:fontFamily="@font/poppins"
+            android:textColor="#32647B"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp">
+            <!-- Delivery Option -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pilih Pengiriman:"
+                android:textColor="#32647B"
+                android:fontFamily="@font/poppins"
+                android:textSize="18sp"
+                android:layout_marginBottom="16dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:textColor="#32647B"
+                    android:fontFamily="@font/poppins"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Ambil ke Toko"
+                    android:textSize="16sp"
+                    android:gravity="center"/>
+
+                <Switch
+                    android:id="@+id/switchDelivery"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:textColor="#32647B"
+                    android:fontFamily="@font/poppins"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Diantar Toko"
+                    android:textSize="16sp"
+                    android:gravity="center"/>
+
+            </LinearLayout>
+
+            <!-- Input Fields -->
+            <TextView
+                android:id="@+id/textName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Masukan nama anda"
+                android:textColor="#32647B"
+                android:fontFamily="@font/poppins"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp"/>
+
+            <EditText
+                android:id="@+id/editName"
+                android:textColor="#32647B"
+                android:fontFamily="@font/poppins"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <LinearLayout
+                android:id="@+id/layoutDeliveryInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/textAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Masukan Alamat"
+                    android:textSize="16sp"
+                    android:textColor="#32647B"
+                    android:fontFamily="@font/poppins"
+                    android:layout_marginTop="16dp"/>
+
+                <EditText
+                    android:id="@+id/editAddress"
+                    android:textColor="#32647B"
+                    android:fontFamily="@font/poppins"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/textZIP"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Masukan Kode Pos"
+                    android:textColor="#32647B"
+                    android:fontFamily="@font/poppins"
+                    android:textSize="16sp"
+                    android:layout_marginTop="16dp"/>
+
+                <EditText
+                    android:id="@+id/editZIP"
+                    android:textColor="#32647B"
+                    android:fontFamily="@font/poppins"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/textNotes"
+                    android:textColor="#32647B"
+                    android:fontFamily="@font/poppins"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Masukan Catatan"
+                    android:textSize="16sp"
+                    android:layout_marginTop="16dp"/>
+
+                <EditText
+                    android:id="@+id/editNotes"
+                    android:textColor="#32647B"
+                    android:fontFamily="@font/poppins"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <!-- Product RecyclerView -->
+            <TextView
+                android:id="@+id/textProducts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Daftar Produk:"
+                android:textColor="#32647B"
+                android:fontFamily="@font/poppins"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/orderRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Order Details -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="16dp">
+
+                <!-- Subtotal -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="#32647B"
+                        android:fontFamily="@font/poppins"
+                        android:text="Subtotal"
+                        android:textSize="16sp"/>
+
+                    <TextView
+                        android:id="@+id/textSubtotal"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Rp. 0"
+                        android:fontFamily="@font/poppins"
+                        android:textSize="16sp"
+                        android:gravity="end"/>
+
+                </LinearLayout>
+
+                <!-- Delivery -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="#32647B"
+                        android:fontFamily="@font/poppins"
+                        android:text="Pengiriman"
+                        android:textSize="16sp"/>
+
+                    <TextView
+                        android:id="@+id/textDelivery"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Rp. 0"
+                        android:fontFamily="@font/poppins"
+                        android:textSize="16sp"
+                        android:gravity="end"/>
+
+                </LinearLayout>
+
+                <!-- Total -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Total"
+                        android:textColor="#32647B"
+                        android:fontFamily="@font/poppins"
+                        android:textSize="16sp"/>
+
+                    <TextView
+                        android:id="@+id/textTotal"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Rp. 0"
+                        android:fontFamily="@font/poppins"
+                        android:textSize="16sp"
+                        android:gravity="end"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Submit Button -->
+            <Button
+                android:id="@+id/submitButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:elevation="6dp"
+                android:textAllCaps="false"
+                android:padding="16dp"
+                android:background="@drawable/button_background_circle_green"
+                android:text="Pembayaran"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+
+
+</LinearLayout>

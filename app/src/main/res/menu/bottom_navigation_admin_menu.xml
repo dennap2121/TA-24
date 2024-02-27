@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_beranda"
+        android:title="Beranda"
+        android:icon="@drawable/icon_home" />
+    <item
+        android:id="@+id/nav_pengiriman"
+        android:title="Pengiriman"
+        android:icon="@drawable/icon_delivery" />
+    <item
+        android:id="@+id/nav_transaksi"
+        android:title="Transaksi"
+        android:icon="@drawable/icon_transaction" />
+    <item
+        android:id="@+id/nav_pengaturan"
+        android:title="Pengaturan"
+        android:icon="@drawable/icon_setting" />
+</menu>

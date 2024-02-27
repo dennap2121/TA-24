@@ -1,0 +1,11 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <stroke
+        android:width="2dp"
+        android:color="#FF0000" /> <!-- Red outline -->
+    <solid
+        android:color="#CCCCCC" /> <!-- Light gray background when pressed -->
+    <size
+        android:width="50dp"
+        android:height="50dp" /> <!-- Adjust size as needed -->
+</shape>

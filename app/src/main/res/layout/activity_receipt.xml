@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/receiptContainer"
+    android:padding="16dp">
+
+    <!-- Logo ImageView -->
+    <ImageView
+        android:id="@+id/logoImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/logo3"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Order Number TextView -->
+    <TextView
+        android:id="@+id/orderNumberTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/logoImageView"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Order Date TextView -->
+    <TextView
+        android:id="@+id/orderDateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/orderNumberTextView"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Delivery Type TextView -->
+    <TextView
+        android:id="@+id/deliveryTypeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/orderDateTextView"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Address TextView -->
+    <TextView
+        android:id="@+id/addressTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/deliveryTypeTextView"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Notes TextView -->
+    <TextView
+        android:id="@+id/notesTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/addressTextView"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Products TextView -->
+    <TextView
+        android:id="@+id/productsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/notesTextView"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Subtotal TextView -->
+    <TextView
+        android:id="@+id/subtotalTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/productsTextView"
+        android:layout_marginTop="8dp"
+        android:text="@string/subtotal_label"/>
+
+    <!-- Delivery Charge TextView -->
+    <TextView
+        android:id="@+id/deliveryChargeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/subtotalTextView"
+        android:layout_marginTop="8dp"
+        android:text="@string/delivery_charge_label"/>
+
+    <!-- Total TextView -->
+    <TextView
+        android:id="@+id/totalTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/deliveryChargeTextView"
+        android:layout_marginTop="8dp"
+        android:text="@string/total_label"/>
+
+    <!-- Zip Code TextView -->
+    <TextView
+        android:id="@+id/zipCodeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/totalTextView"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Share Button -->
+    <Button
+        android:id="@+id/shareButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/zipCodeTextView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="Share Receipt"/>
+
+</RelativeLayout>

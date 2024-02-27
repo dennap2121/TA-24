@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_beranda"
+        android:title="Beranda"
+        android:icon="@drawable/icon_home" />
+    <item
+        android:id="@+id/nav_keranjang"
+        android:title="Keranjang"
+        android:icon="@drawable/icon_cart" />
+    <item
+        android:id="@+id/nav_history"
+        android:title="History Pemesan"
+        android:icon="@drawable/icon_history" />
+</menu>

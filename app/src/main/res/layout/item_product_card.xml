@@ -1,0 +1,95 @@
+<!-- item_product.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/productImageView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/default_placeholder" />
+
+    <TextView
+        android:id="@+id/productNameTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Product Name"
+        android:layout_marginTop="10dp"
+        android:textColor="#32647B"
+        android:fontFamily="@font/poppins"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/productPriceTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Price"
+        android:textColor="#32647B"
+        android:fontFamily="@font/poppins"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <Button
+            android:id="@+id/addToCartButton"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:text="Tambah ke Keranjang"
+            android:textAllCaps="false"
+            android:textSize="10sp"
+            android:fontFamily="@font/poppins"
+            android:background="@drawable/button_background_circle"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/counterLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageButton
+                android:id="@+id/minusButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@color/white"
+                android:src="@drawable/icon_minus_red"
+                android:stateListAnimator="@null" />
+
+            <TextView
+                android:id="@+id/quantityTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:textSize="18sp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp" />
+
+            <ImageButton
+                android:id="@+id/plusButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/icon_plus_red"
+                android:background="@color/white"
+                android:stateListAnimator="@null" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

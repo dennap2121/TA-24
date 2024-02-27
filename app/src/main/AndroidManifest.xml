@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:name="androidx.multidex.MultiDexApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.BayzzeApp"
+        tools:targetApi="31">
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+        <activity
+            android:name=".activity.ProfileActivity"
+            android:exported="true" />
+        <activity
+            android:name=".activity.SplashScreenActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Splash">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.SignInActivity"
+            android:exported="true"
+            android:theme="@style/Theme.LoginAndSignUp" />
+        <activity
+            android:name=".activity.SignUpActivity"
+            android:exported="true"
+            android:theme="@style/Theme.LoginAndSignUp" />
+        <activity
+            android:name=".activity.MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.CategoryActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.CartActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.OrderActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.PaymentActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.AboutActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.ListActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.HistoryActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.ReceiptActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.AdminActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.TimeActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.ReviewActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.ReviewAddActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.SearchActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.DeliveryActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.TransactionsActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.SettingActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.ManageProductActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.ConfigProductActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.ManageUserActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.ManageContentActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.ManageTimeActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.ManageCategoryActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
+    </application>
+
+</manifest>
