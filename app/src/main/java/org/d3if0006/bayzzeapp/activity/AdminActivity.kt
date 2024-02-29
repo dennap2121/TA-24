@@ -41,6 +41,7 @@ import com.google.firebase.firestore.Query
 import org.d3if0006.bayzzeapp.R
 import org.d3if0006.bayzzeapp.databinding.ActivityAdminBinding
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -165,14 +166,38 @@ class AdminActivity : AppCompatActivity() {
         }.time
 
         val ordersRef = firestore.collection("orders")
-        val todayOrdersQuery = ordersRef.whereGreaterThanOrEqualTo("createdAt", today)
+        val todayOrdersQuery = ordersRef
+//            .whereGreaterThanOrEqualTo("createdAt", today)
+            .whereIn("status", listOf("Selesai Pembayaran", "Proses Pengiriman", "Selesai"))
 
         todayOrdersQuery.get()
             .addOnSuccessListener { documents ->
-                val numberOfOrders = documents.size()
-                val totalRevenue = documents.sumByDouble { document ->
-                    document.getDouble("total") ?: 0.0
+                var numberOfOrders = 0
+                var totalRevenue = 0.0
+
+                documents.forEach { document ->
+
+                    val dateString = today
+                    val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss 'GMT'Z yyyy", Locale.US)
+                    val dateNow = dateFormat.parse(dateString.toString())
+                    val targetFormatNow = SimpleDateFormat("yyyy/MM/dd", Locale.US)
+                    val formattedDateNow = targetFormatNow.format(dateNow)
+
+                    val timestamp = document["createdAt"].toString()
+                    val seconds = timestamp.substringAfter("seconds=").substringBefore(",").toLong()
+                    val date = Date(seconds * 1000) // Convert seconds to milliseconds
+                    val outputFormat = SimpleDateFormat("yyyy/MM/dd", Locale.US)
+                    val formattedDate = outputFormat.format(date)
+
+//                    Log.d("pop", "today ${formattedDateNow} from data ${formattedDate}")
+
+                    if (formattedDateNow == formattedDate) {
+                        totalRevenue += document["total"] as Double
+                        numberOfOrders++
+                    }
                 }
+
+
 
                 val formattedRevenue = NumberFormat.getCurrencyInstance(Locale("id", "ID")).format(totalRevenue)
                 val valuePemasukan = findViewById<TextView>(R.id.valuePemasukan)

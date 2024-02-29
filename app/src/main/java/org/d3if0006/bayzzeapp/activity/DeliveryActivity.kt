@@ -129,7 +129,7 @@ class DeliveryActivity : AppCompatActivity() {
         val db = FirebaseFirestore.getInstance()
         val query = if (tabName == "Permintaan") {
             db.collection("orders")
-                .whereIn("status", listOf("Sedang Proses", "Proses Pengiriman"))
+                .whereIn("status", listOf("Selesai Pembayaran", "Proses Pengiriman"))
         } else {
             db.collection("orders")
                 .whereIn("status", listOf("Selesai", "Ditolak"))
@@ -220,9 +220,10 @@ class DeliveryActivity : AppCompatActivity() {
             if(order.status == "Selesai"){
                 holder.deliveryTolakTextView.visibility = View.GONE
                 holder.deliveryDetailTextView.visibility = View.GONE
-                holder.deliveryTerimaTextView.text = "Selesai"
-                holder.deliveryTerimaTextView.setTextColor(ContextCompat.getColor(context, R.color.green_light)) // Set red color
-                holder.deliveryTerimaTextView.setBackgroundResource(R.drawable.green_border) // Set red border background
+                holder.deliveryTerimaTextView.visibility = View.GONE
+//                holder.deliveryTerimaTextView.text = "Selesai"
+//                holder.deliveryTerimaTextView.setTextColor(ContextCompat.getColor(context, R.color.green_light)) // Set red color
+//                holder.deliveryTerimaTextView.setBackgroundResource(R.drawable.green_border) // Set red border background
             }
 
             if(order.status == "Ditolak"){
@@ -432,6 +433,10 @@ class DeliveryActivity : AppCompatActivity() {
                                         "Selesai"
                                     } else {
                                         "Diterima"
+                                    }
+
+                                    if(updatedStatus == "Selesai"){
+                                        holder.deliveryTerimaTextView.visibility = View.GONE
                                     }
 
                                     // Dismiss the loading indicator

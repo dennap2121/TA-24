@@ -163,7 +163,7 @@ class PaymentActivity : AppCompatActivity() {
             .update(
                 mapOf(
                     "buktiPembayaran" to imageUrl,
-//                    "status" to "Selesai"
+                    "status" to "Selesai Pembayaran"
                 )
             )
             .addOnSuccessListener {
