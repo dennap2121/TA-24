@@ -55,7 +55,7 @@
             android:layout_weight="1" />
 
         <LinearLayout
-            android:layout_width="130dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
@@ -86,6 +86,15 @@
                 android:stateListAnimator="@null" />
 
         </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/deleteButton"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/icon_delete_2"
+            android:background="@color/white"
+            android:layout_marginEnd="10dp"
+            android:stateListAnimator="@null" />
 
 
 

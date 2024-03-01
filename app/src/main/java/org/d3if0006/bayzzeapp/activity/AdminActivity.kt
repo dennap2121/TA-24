@@ -126,6 +126,7 @@ class AdminActivity : AppCompatActivity() {
         val ulasanButton = findViewById<TextView>(R.id.ulasanSemua)
         ulasanButton.setOnClickListener {
             val Intent = Intent( this, ReviewActivity::class.java)
+            intent.putExtra("isAdmin", true)
             startActivity(Intent)
         }
 
@@ -247,7 +248,7 @@ class AdminActivity : AppCompatActivity() {
     private fun fetchProductData() {
         showLoading()
         val db = FirebaseFirestore.getInstance()
-        db.collection("products")
+        db.collection("products").whereEqualTo("isRecommended", true)
             .get()
             .addOnSuccessListener { documents ->
                 hideLoading()

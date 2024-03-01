@@ -95,12 +95,26 @@
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:text="email" />
+
         <TextView
             android:id="@+id/phone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:text="phone" />
+
+        <TextView
+            android:id="@+id/editProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Edit Profile"
+            android:textColor="@color/primary"
+            android:layout_marginTop="8dp"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"/>
+
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/tentang"

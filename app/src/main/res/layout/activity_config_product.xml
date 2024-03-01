@@ -148,6 +148,29 @@
                 android:fontFamily="@font/poppins"
                 android:layout_marginTop="8dp"/>
 
+            <!-- Add Recommended Switch -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recommended"
+                    android:textColor="#32647B"
+                    android:fontFamily="@font/poppins"
+                    android:textSize="16sp"/>
+
+                <Switch
+                    android:id="@+id/switchRecommended"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="end"/>
+            </LinearLayout>
+
             <Button
                 android:id="@+id/submitButton"
                 android:layout_width="match_parent"

@@ -60,6 +60,24 @@
                 android:textColor="@color/grey_font"
                 android:text="Tanggal" />
 
+            <TextView
+                android:id="@+id/orderRejectTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:textColor="@color/red"
+                android:visibility="gone"
+                android:text="Reject:" />
+
+            <TextView
+                android:id="@+id/orderRejectReasonTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:visibility="gone"
+                android:textColor="@color/red"
+                android:text="-" />
+
             <View
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"

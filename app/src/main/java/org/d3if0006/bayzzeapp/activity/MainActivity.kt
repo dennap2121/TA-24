@@ -302,7 +302,7 @@ class MainActivity : AppCompatActivity() {
     private fun fetchProductData() {
         showLoading("Produk")
         val db = FirebaseFirestore.getInstance()
-        db.collection("products")
+        db.collection("products").whereEqualTo("isRecommended", true)
             .get()
             .addOnSuccessListener { documents ->
                 hideLoading()

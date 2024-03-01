@@ -6,6 +6,9 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -46,6 +49,10 @@ class ProfileActivity : AppCompatActivity() {
 
         binding.ulasan.setOnClickListener {
             navigateToReviewActivity()
+        }
+
+        binding.editProfile.setOnClickListener{
+            navigateToEditProfileActivity()
         }
 
         binding.bagikan.setOnClickListener {
@@ -154,4 +161,68 @@ class ProfileActivity : AppCompatActivity() {
     private fun hideLoading() {
         progressDialog.dismiss()
     }
+
+    private fun navigateToEditProfileActivity() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Edit Profile")
+
+        // Inflate the custom layout for the dialog
+        val view = layoutInflater.inflate(R.layout.dialog_edit_profile, null)
+        builder.setView(view)
+
+        // Get references to the EditText fields and the update button in the dialog layout
+        val nameEditText = view.findViewById<EditText>(R.id.editTextName)
+        val phoneEditText = view.findViewById<EditText>(R.id.editTextPhone)
+        val updateButton = view.findViewById<Button>(R.id.buttonUpdate)
+
+        // Populate EditText fields with current user profile data
+        nameEditText.setText(binding.name.text)
+        phoneEditText.setText(binding.phone.text)
+
+        // Create the dialog
+        val dialog = builder.create()
+
+        // Set click listener for the update button
+        updateButton.setOnClickListener {
+            // Get updated name and phone number from EditText fields
+            val updatedName = nameEditText.text.toString()
+            val updatedPhone = phoneEditText.text.toString()
+
+            // Perform validation if needed
+
+            // Update user information in Firestore
+            updateUserProfile(updatedName, updatedPhone)
+
+            // Dismiss the dialog
+            dialog.dismiss()
+        }
+
+        // Show the dialog
+        dialog.show()
+    }
+
+    private fun updateUserProfile(name: String, phone: String) {
+        val db = FirebaseFirestore.getInstance()
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        if (uid != null) {
+            val userRef = db.collection("user_info").document(uid)
+            userRef.update(mapOf(
+                "name" to name,
+                "phone" to phone
+            ))
+                .addOnSuccessListener {
+                    // Update UI with new data if needed
+                    binding.name.text = name
+                    binding.phone.text = phone
+
+                    // Show a toast or message indicating successful update
+                    Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { exception ->
+                    // Show a toast or message indicating failure
+                    Toast.makeText(this, "Failed to update profile: ${exception.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
 }

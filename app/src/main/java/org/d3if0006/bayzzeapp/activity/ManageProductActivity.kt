@@ -316,6 +316,7 @@ class ManageProductActivity : AppCompatActivity() {
                     // Navigate to ConfigAdapterActivity
                     val intent = Intent(itemView.context, ConfigProductActivity::class.java)
                     intent.putExtra("id", product.id)
+                    intent.putExtra("previousImage", product.image)
                     itemView.context.startActivity(intent)
                 }
 

@@ -50,6 +50,7 @@ class ConfigProductActivity : AppCompatActivity() {
     private lateinit var submitButton: Button
     private lateinit var pickImageButton: ImageButton
     private lateinit var imageView: ImageView
+    private lateinit var switchRecommended: Switch
     private lateinit var progressDialog: ProgressDialog // Declare ProgressDialog
     private var selectedImageUri: Uri? = null
 
@@ -67,6 +68,7 @@ class ConfigProductActivity : AppCompatActivity() {
         submitButton = findViewById(R.id.submitButton)
         pickImageButton = findViewById(R.id.pickImageButton)
         imageView = findViewById(R.id.imageView)
+        switchRecommended = findViewById<Switch>(R.id.switchRecommended)
 
         progressDialog = ProgressDialog(this) // Initialize ProgressDialog
 
@@ -100,6 +102,7 @@ class ConfigProductActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
+                    val isRecommended = document.getBoolean("isRecommended") ?: false
                     val product = document.toObject(Product::class.java)
                     if (product != null) {
                         // Populate UI fields with the retrieved product details
@@ -116,9 +119,11 @@ class ConfigProductActivity : AppCompatActivity() {
                             .error(R.drawable.background_oval_1) // Optional: Image to display if loading fails
                             .into(pickImageButton)
 
+                        switchRecommended.isChecked = isRecommended
 
                         // Save the selected image URI
                         selectedImageUri = Uri.parse(product.image)
+
                     }
                 }
             }
@@ -158,6 +163,7 @@ class ConfigProductActivity : AppCompatActivity() {
         val qty = editQty.text.toString().toInt() // Convert quantity to Int
         val price = editPrice.text.toString().toDouble() // Convert price to Double
         val category = spinnerCategory.selectedItem.toString()
+        val isRecommended = switchRecommended.isChecked
 
         // Check if an image is selected
         if (selectedImageUri == null) {
@@ -165,82 +171,13 @@ class ConfigProductActivity : AppCompatActivity() {
             return
         }
 
-        // Create a reference to Firebase Storage
-        val storageRef = FirebaseStorage.getInstance().reference
-
-        // Generate a random UUID for the image filename
-        val imageName = UUID.randomUUID().toString()
-
-        // Create a reference to the image location in Firebase Storage
-        val imageRef = storageRef.child("images/$imageName")
-
-        // Upload the image to Firebase Storage
-        val uploadTask = imageRef.putFile(selectedImageUri!!)
-
-        showLoading()
-
-        // Register observers to listen for upload progress or failure
-        uploadTask.addOnFailureListener { exception ->
-            Log.e(TAG, "Image upload failed", exception)
-            Toast.makeText(this, "Image upload failed", Toast.LENGTH_SHORT).show()
-            hideLoading()
-        }.addOnSuccessListener { taskSnapshot ->
-            // Get the image URL from Firebase Storage
-            imageRef.downloadUrl.addOnSuccessListener { imageUrl ->
-                val db = FirebaseFirestore.getInstance()
-
-                // Check if it's an update operation
-                val id = intent.getStringExtra("id")
-                if (!id.isNullOrEmpty()) {
-                    // Update existing product
-                    db.collection("products").document(id)
-                        .update(
-                            "name", name,
-                            "quantity", qty,
-                            "price", price,
-                            "category", category,
-                            "image", imageUrl.toString() // Store the image URL
-                        )
-                        .addOnSuccessListener {
-                            Log.d(TAG, "Product updated successfully")
-                            Toast.makeText(this, "Product updated successfully", Toast.LENGTH_SHORT).show()
-                            hideLoading()
-                        }
-                        .addOnFailureListener { e ->
-                            Log.w(TAG, "Error updating product", e)
-                            Toast.makeText(this, "Failed to update product", Toast.LENGTH_SHORT).show()
-                            hideLoading()
-                        }
-                } else {
-                    // Add new product
-                    val product = hashMapOf(
-                        "name" to name,
-                        "quantity" to qty,
-                        "price" to price,
-                        "category" to category,
-                        "image" to imageUrl.toString() // Store the image URL
-                        // Add more fields as needed
-                    )
-
-                    // Add the product to the "products" collection in Firestore
-                    db.collection("products")
-                        .add(product)
-                        .addOnSuccessListener { documentReference ->
-                            Log.d(TAG, "Product added with ID: ${documentReference.id}")
-                            Toast.makeText(this, "Product added successfully!", Toast.LENGTH_SHORT).show()
-                            hideLoading()
-                        }
-                        .addOnFailureListener { e ->
-                            Log.w(TAG, "Error adding product", e)
-                            Toast.makeText(this, "Failed to add product", Toast.LENGTH_SHORT).show()
-                            hideLoading()
-                        }
-                }
-            }.addOnFailureListener { exception ->
-                Log.e(TAG, "Error getting image URL", exception)
-                Toast.makeText(this, "Error getting image URL", Toast.LENGTH_SHORT).show()
-                hideLoading()
-            }
+        // Check if it's an edit operation with no image change
+        val id = intent.getStringExtra("id")
+        if (!id.isNullOrEmpty() && selectedImageUri.toString() == intent.getStringExtra("previousImage")) {
+            updateProductDetails(name, qty, price, category, isRecommended)
+        } else {
+            // Otherwise, proceed with uploading the image and updating product details
+            uploadImageAndProductDetails(name, qty, price, category, isRecommended)
         }
     }
 
@@ -321,6 +258,116 @@ class ConfigProductActivity : AppCompatActivity() {
                     pickImageButton.setImageBitmap(imageBitmap)
 
                 }
+            }
+        }
+    }
+
+    private fun updateProductDetails(name: String, qty: Int, price: Double, category: String, isRecommended: Boolean) {
+        val id = intent.getStringExtra("id")
+        if (id != null) {
+            val db = FirebaseFirestore.getInstance()
+            db.collection("products").document(id)
+                .update(
+                    "name", name,
+                    "quantity", qty,
+                    "price", price,
+                    "category", category,
+                    "isRecommended", isRecommended,
+                    // Add more fields as needed
+                )
+                .addOnSuccessListener {
+                    Log.d(TAG, "Product updated successfully")
+                    Toast.makeText(this, "Product updated successfully", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, ManageProductActivity::class.java))
+                    finish()
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "Error updating product", e)
+                    Toast.makeText(this, "Failed to update product", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+    private fun uploadImageAndProductDetails(name: String, qty: Int, price: Double, category: String, isRecommended: Boolean) {
+        // Create a reference to Firebase Storage
+        val storageRef = FirebaseStorage.getInstance().reference
+
+        // Generate a random UUID for the image filename
+        val imageName = UUID.randomUUID().toString()
+
+        // Create a reference to the image location in Firebase Storage
+        val imageRef = storageRef.child("images/$imageName")
+
+        // Upload the image to Firebase Storage
+        val uploadTask = imageRef.putFile(selectedImageUri!!)
+
+        showLoading()
+
+        // Register observers to listen for upload progress or failure
+        uploadTask.addOnFailureListener { exception ->
+            Log.e(TAG, "Image upload failed", exception)
+            Toast.makeText(this, "Image upload failed", Toast.LENGTH_SHORT).show()
+            hideLoading()
+        }.addOnSuccessListener { taskSnapshot ->
+            // Get the image URL from Firebase Storage
+            imageRef.downloadUrl.addOnSuccessListener { imageUrl ->
+                val db = FirebaseFirestore.getInstance()
+
+                // Check if it's an update operation
+                val id = intent.getStringExtra("id")
+                if (!id.isNullOrEmpty()) {
+                    // Update existing product
+                    db.collection("products").document(id)
+                        .update(
+                            "name", name,
+                            "quantity", qty,
+                            "price", price,
+                            "category", category,
+                            "image", imageUrl.toString(),
+                            "isRecommended", isRecommended,
+                        )
+                        .addOnSuccessListener {
+                            Log.d(TAG, "Product updated successfully")
+                            Toast.makeText(this, "Product updated successfully", Toast.LENGTH_SHORT).show()
+                            hideLoading()
+                            finish() // Finish the activity after updating the product
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w(TAG, "Error updating product", e)
+                            Toast.makeText(this, "Failed to update product", Toast.LENGTH_SHORT).show()
+                            hideLoading()
+                        }
+                } else {
+                    // Add new product
+                    val product = hashMapOf(
+                        "name" to name,
+                        "quantity" to qty,
+                        "price" to price,
+                        "category" to category,
+                        "isRecommended" to isRecommended,
+                        "image" to imageUrl.toString() // Store the image URL
+                        // Add more fields as needed
+                    )
+
+                    // Add the product to the "products" collection in Firestore
+                    db.collection("products")
+                        .add(product)
+                        .addOnSuccessListener { documentReference ->
+                            Log.d(TAG, "Product added with ID: ${documentReference.id}")
+                            Toast.makeText(this, "Product added successfully!", Toast.LENGTH_SHORT).show()
+                            hideLoading()
+                            finish() // Finish the activity after adding the product
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w(TAG, "Error adding product", e)
+                            Toast.makeText(this, "Failed to add product", Toast.LENGTH_SHORT).show()
+                            hideLoading()
+                        }
+                }
+            }.addOnFailureListener { exception ->
+                Log.e(TAG, "Error getting image URL", exception)
+                Toast.makeText(this, "Error getting image URL", Toast.LENGTH_SHORT).show()
+                hideLoading()
             }
         }
     }

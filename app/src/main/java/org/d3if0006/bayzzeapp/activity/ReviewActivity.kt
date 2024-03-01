@@ -1,5 +1,6 @@
 package org.d3if0006.bayzzeapp.activity
 
+import android.app.Activity
 import android.app.ProgressDialog
 import android.content.ContentValues
 import android.content.Context
@@ -34,11 +35,18 @@ class ReviewActivity : AppCompatActivity() {
     private lateinit var progressDialog: ProgressDialog
     private lateinit var reviewList: MutableList<Review>
     private lateinit var reviewRecyclerView: RecyclerView
+    private lateinit var isAdmin: String
+
+    companion object {
+        private const val ADD_REVIEW_REQUEST_CODE = 100
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         progressDialog = ProgressDialog(this) // Initialize ProgressDialog
+
+        isAdmin = intent.getStringExtra("isAdmin") ?: ""
 
         fetchReviewData()
 
@@ -46,7 +54,6 @@ class ReviewActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.profileBackBtn.setOnClickListener {
-//            navigateToMainActivity()
             finish()
         }
 
@@ -59,16 +66,9 @@ class ReviewActivity : AppCompatActivity() {
         reviewRecyclerView.layoutManager = LinearLayoutManager(this)
     }
 
-    private fun navigateToMainActivity() {
-        val intent = Intent(this, ProfileActivity::class.java)
-        startActivity(intent)
-        finish() // Finish SignInActivity to prevent returning to it when pressing back button from MainActivity
-    }
-
     private fun navigateToReviewAddActivity() {
         val intent = Intent(this, ReviewAddActivity::class.java)
-        startActivity(intent)
-        finish() // Finish SignInActivity to prevent returning to it when pressing back button from MainActivity
+        startActivityForResult(intent, ADD_REVIEW_REQUEST_CODE)
     }
 
     private fun fetchReviewData() {
@@ -93,7 +93,8 @@ class ReviewActivity : AppCompatActivity() {
                 displayReviewList(reviewList)
                 val adapter = ReviewAdapter(
                     reviewList,
-                    this
+                    this,
+                    isAdmin
                 ) // Pass tabName to adapter
                 reviewRecyclerView.adapter = adapter
             }
@@ -108,7 +109,8 @@ class ReviewActivity : AppCompatActivity() {
 
     class ReviewAdapter(
         private val reviewList: List<Review>,
-        private val context: Context
+        private val context: Context,
+        private val isAdmin: String
     ) : RecyclerView.Adapter<ReviewViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReviewViewHolder {
@@ -144,7 +146,7 @@ class ReviewActivity : AppCompatActivity() {
                 val commentText = holder.reviewCommentEditText.text.toString().trim()
 
                 if (commentText.isNotEmpty()) {
-                    addCommentToFirestore(review.id, commentText)
+                    addCommentToFirestore(review.id, commentText, isAdmin)
                     holder.reviewCommentEditText.text.clear()
                 } else {
                     Toast.makeText(context, "Comment cannot be empty", Toast.LENGTH_SHORT).show()
@@ -156,7 +158,7 @@ class ReviewActivity : AppCompatActivity() {
             return reviewList.size
         }
 
-        private fun addCommentToFirestore(id: String, commentText: String) {
+        private fun addCommentToFirestore(id: String, commentText: String, isAdmin: String) {
             val db = FirebaseFirestore.getInstance()
             val reviewRef = db.collection("reviews")
             val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -169,8 +171,17 @@ class ReviewActivity : AppCompatActivity() {
                             if (userProfile != null) {
                                 // Populate the UI with user profile data
 
+                                var name = userProfile.name
+
+                                Log.d("plm", isAdmin)
+
+                                if(isAdmin != "" || isAdmin != null){
+                                    Log.d("plm", "isNotAdmin")
+                                    name = "admin"
+                                }
+
                                 val newComment = hashMapOf(
-                                    "name" to userProfile.name,
+                                    "name" to name,
                                     "comment" to commentText
                                 )
 
@@ -218,6 +229,18 @@ class ReviewActivity : AppCompatActivity() {
     }
 
     data class Review(val id: String, val name: String, val date: String, val review: String, val comments: List<HashMap<String, String>>?)
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        Log.d("lopop", requestCode.toString())
+        Log.d("lopop", ADD_REVIEW_REQUEST_CODE.toString())
+        Log.d("lopop", resultCode.toString())
+        Log.d("lopop", Activity.RESULT_OK.toString())
+        if (requestCode == ADD_REVIEW_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            // Refresh review list
+            fetchReviewData()
+        }
+    }
 
 }
 

@@ -34,13 +34,22 @@
             android:layout_alignParentEnd="true"/>
     </RelativeLayout>
 
+    <Button
+        android:id="@+id/btnTambah"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tambah"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/headerLayout"
+        android:layout_marginEnd="16dp" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/header"
         android:padding="16dp"
         android:background="@color/grey_font"
-        android:layout_below="@id/headerLayout"
+        android:layout_below="@id/btnTambah"
         android:orientation="horizontal">
 
         <TextView
@@ -63,6 +72,15 @@
 
         <TextView
             android:text="Gambar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins"
+            android:textColor="@color/black"
+            android:layout_weight="1"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:text="Action"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins"

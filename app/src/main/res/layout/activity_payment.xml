@@ -287,6 +287,26 @@
 
         </LinearLayout>
 
+        <Button
+            android:layout_marginTop="10dp"
+            android:id="@+id/homePageButton"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:text="Kembali ke Beranda"
+            android:textAllCaps="false"
+            android:fontFamily="@font/poppins"
+            android:textSize="16sp"
+            android:background="@drawable/button_background_circle"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:visibility="gone" />
+
+
+
     </LinearLayout>
 
 

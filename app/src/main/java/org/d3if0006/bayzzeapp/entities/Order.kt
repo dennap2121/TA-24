@@ -15,6 +15,9 @@ data class Order(
     val address: String,
     val notes: String,
     val status: String,
+    val paymentImage: String,
+    val paymentType: String,
+    val rejectReason: String,
     ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
@@ -24,6 +27,9 @@ data class Order(
         parcel.createTypedArrayList(OrderProduct.CREATOR) ?: emptyList(),
         parcel.readDouble(),
         parcel.readDouble(),
+        parcel.readString() ?: "",
+        parcel.readString() ?: "",
+        parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readString() ?: "",
@@ -44,6 +50,9 @@ data class Order(
         parcel.writeString(address)
         parcel.writeString(notes)
         parcel.writeString(status)
+        parcel.writeString(paymentImage)
+        parcel.writeString(paymentType)
+        parcel.writeString(rejectReason)
     }
 
     override fun describeContents(): Int {

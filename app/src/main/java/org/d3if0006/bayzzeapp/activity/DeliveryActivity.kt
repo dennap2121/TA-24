@@ -150,6 +150,10 @@ class DeliveryActivity : AppCompatActivity() {
                     val orderAddress = document.getString("address") ?: ""
                     val orderNotes = document.getString("notes") ?: ""
                     val orderStatus = document.getString("status") ?: ""
+                    val orderPaymentImage = document.getString("buktiPembayaran") ?: ""
+                    val orderPaymentType = document.getString("paymentType") ?: ""
+                    val orderRejectReason = document.getString("rejectReason") ?: ""
+
 
                     val orderProducts = document.get("products") as? List<HashMap<String, Any>>
                     val productList = orderProducts?.map {
@@ -167,7 +171,7 @@ class DeliveryActivity : AppCompatActivity() {
                     } ?: emptyList()
 
                     val order = Order(orderId, orderDeliveryType, orderTotal,
-                        orderCreatedAt!!, productList, orderPengiriman, orderSubtotal, orderName, orderUserId, orderAddress, orderNotes, orderStatus)
+                        orderCreatedAt!!, productList, orderPengiriman, orderSubtotal, orderName, orderUserId, orderAddress, orderNotes, orderStatus, orderPaymentImage, orderPaymentType, orderRejectReason)
                     orderList.add(order)
                 }
                 // Call a function to display or process the order list

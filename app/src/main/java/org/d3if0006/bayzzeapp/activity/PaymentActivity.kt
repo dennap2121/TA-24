@@ -45,6 +45,8 @@ class PaymentActivity : AppCompatActivity() {
     private lateinit var textBankAccountBRI: TextView
 
     private lateinit var backButton: ImageButton
+    private lateinit var uploadButton: LinearLayout
+    private lateinit var homePageButton: Button
 
     private lateinit var selectedImageUri: Uri
     private val storageReference = FirebaseStorage.getInstance().reference
@@ -69,10 +71,14 @@ class PaymentActivity : AppCompatActivity() {
         textBankAccountBCA = findViewById(R.id.textBankAccountBCA)
         textBankAccountBRI = findViewById(R.id.textBankAccountBRI)
 
+        uploadButton = findViewById(R.id.uploadButton)
+        homePageButton = findViewById(R.id.homePageButton)
+
         // Get order details from intent extras
         val subtotal = intent.getDoubleExtra("subtotal", 0.0)
         val deliveryCost = intent.getDoubleExtra("deliveryCost", 0.0)
         val total = intent.getDoubleExtra("total", 0.0)
+        val orderId = intent.getStringExtra("orderId")
 
         // Set order details in the UI
         textSubtotal.text = "Rp ${DecimalFormat("#,###.##").format(subtotal)}"
@@ -84,9 +90,37 @@ class PaymentActivity : AppCompatActivity() {
         textBankAccountBCA.text = "987-654-321 (BCA)"
         textBankAccountBRI.text = "567-890-123 (BRI)"
 
+        homePageButton.setOnClickListener{
+            // Navigate to the home page
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+        }
+
         backButton.setOnClickListener{
             finish()
         }
+
+        checkOrderStatus(orderId ?: "")
+    }
+
+    private fun checkOrderStatus(orderId: String) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("orders").document(orderId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    val status = document.getString("status")
+                    if (status == "Selesai Pembayaran") {
+                        // Order status is "Selesai Pembayaran", hide the upload button and show the home page button
+                        uploadButton.visibility = View.GONE
+                        homePageButton.visibility = View.VISIBLE
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                // Handle failure
+                Toast.makeText(this, "Failed to retrieve order status: ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
     // Copy Total value
@@ -169,6 +203,9 @@ class PaymentActivity : AppCompatActivity() {
             .addOnSuccessListener {
                 hideLoading()
                 Toast.makeText(this, "Image uploaded successfully", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, HistoryActivity::class.java)
+                startActivity(intent)
+                finish()
             }
             .addOnFailureListener { exception ->
                 // Handle error

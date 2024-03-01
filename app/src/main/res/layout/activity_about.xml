@@ -74,16 +74,121 @@
             app:srcCompat="@drawable/logo2"
             tools:ignore="MissingConstraints" />
 
-        <TextView
-            android:id="@+id/description"
-            android:layout_width="350dp"
-            android:textStyle="bold"
-            android:layout_marginTop="80dp"
-            android:textAlignment="viewStart"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Desc"
-            android:textSize="14sp"
-            android:textColor="@color/white"/>
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <!-- Description TextView -->
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="350dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="80dp"
+                android:text="Description"
+                android:textAlignment="viewStart"
+                android:textSize="14sp"
+                android:textColor="@color/white"/>
+
+            <!-- Social Media -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <!-- Instagram -->
+                <ImageView
+                    android:id="@+id/instagramIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/icon_instagram"
+                    android:onClick="openInstagram" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins"
+                    android:textColor="@color/white"
+                    android:id="@+id/instagramText"
+                    android:text="Bayzee"
+                    android:onClick="openInstagram"
+                    android:clickable="true"/>
+
+                <!-- Facebook -->
+                <ImageView
+                    android:id="@+id/facebookIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/icon_facebook"
+                    android:onClick="openFacebook" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bayzee"
+                    android:id="@+id/facebookText"
+                    android:fontFamily="@font/poppins"
+                    android:textColor="@color/white"
+                    android:onClick="openFacebook"
+                    android:clickable="true"/>
+
+            </LinearLayout>
+
+            <!-- WhatsApp Contact -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/whatsappIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/icon_whatsapp"
+                    android:onClick="openWhatsApp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+628328294"
+                    android:id="@+id/whatsappText"
+                    android:fontFamily="@font/poppins"
+                    android:textColor="@color/white"
+                    android:onClick="openWhatsApp"
+                    android:clickable="true"/>
+
+            </LinearLayout>
+
+            <!-- Location Info -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/locationIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/icon_map"
+                    android:onClick="openMap" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bandung"
+                    android:id="@+id/mapText"
+                    android:fontFamily="@font/poppins"
+                    android:textColor="@color/white"
+                    android:onClick="openMap"
+                    android:clickable="true"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
 
 
     </LinearLayout>

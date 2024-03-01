@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import org.d3if0006.bayzzeapp.R
 import org.d3if0006.bayzzeapp.databinding.ActivityTimeBinding
 import java.text.NumberFormat
@@ -64,6 +65,8 @@ class TimeActivity : AppCompatActivity() {
         if (uid != null) {
             val db = FirebaseFirestore.getInstance()
             val query = db.collection("times")
+                .orderBy("index", Query.Direction.ASCENDING) // Order by "index" field in ascending order
+
             query.get()
                 .addOnSuccessListener { documents ->
                     hideLoading()
@@ -72,8 +75,9 @@ class TimeActivity : AppCompatActivity() {
                         val timeDay = document.getString("day") ?: "-"
                         val timeOpen = document.getString("open") ?: "00.00"
                         val timeClose = document.getString("close") ?: "00.00"
+                        val index = document.getDouble("index") ?: 0.0
 
-                        val time = Time(timeDay, timeOpen, timeClose)
+                        val time = Time(timeDay, timeOpen, timeClose, index)
                         timeList.add(time)
                     }
                     // Call a function to display or process the order list
@@ -89,6 +93,7 @@ class TimeActivity : AppCompatActivity() {
                 }
         }
     }
+
 
     private fun displayTimeList(timeList: List<Time>) {
         // Implement your logic to display the time list, such as setting up a RecyclerView adapter
@@ -133,6 +138,6 @@ class TimeActivity : AppCompatActivity() {
         progressDialog.dismiss()
     }
 
-    data class Time(val day: String, val open: String, val close: String)
+    data class Time(val day: String, val open: String, val close: String, val index: Double)
 
 }

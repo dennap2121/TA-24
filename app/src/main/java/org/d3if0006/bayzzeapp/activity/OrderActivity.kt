@@ -8,13 +8,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Spinner
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -42,7 +46,8 @@ class OrderActivity : AppCompatActivity() {
     private lateinit var textDelivery: TextView
     private lateinit var textTotal: TextView
     private lateinit var submitButton: Button
-    private lateinit var progressDialog: ProgressDialog // Declare ProgressDialog
+    private lateinit var progressDialog: ProgressDialog
+    private lateinit var areaSpinner: Spinner
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +65,14 @@ class OrderActivity : AppCompatActivity() {
         textDelivery = findViewById(R.id.textDelivery)
         textTotal = findViewById(R.id.textTotal)
         submitButton = findViewById(R.id.submitButton)
+        areaSpinner = findViewById(R.id.areaSpinner)
+
+
+        // Set up the area spinner
+        val areas = arrayOf("Bandung Barat", "Bandung Timur", "Bandung Selatan", "Bandung Utara", "Bandung Tengah", "Kabupaten Bandung")
+        val adapterArea = ArrayAdapter(this, android.R.layout.simple_spinner_item, areas)
+        adapterArea.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        areaSpinner.adapter = adapterArea
 
         layoutDeliveryInfo = findViewById(R.id.layoutDeliveryInfo)
 
@@ -81,7 +94,11 @@ class OrderActivity : AppCompatActivity() {
         }
 
         binding.submitButton.setOnClickListener{
-            submitOrder()
+            if (switchDelivery.isChecked) {
+                showPaymentTypeDialog()
+            } else {
+                submitOrder("transfer")
+            }
         }
 
         selectedProducts = intent.getParcelableArrayListExtra<Product>("selectedProducts") ?: mutableListOf()
@@ -92,10 +109,17 @@ class OrderActivity : AppCompatActivity() {
         orderRecyclerView.layoutManager = LinearLayoutManager(this)
         orderRecyclerView.adapter = adapter
 
-        // Calculate and update order details
+        areaSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                // Calculate and update order details when the area is changed
+                updateOrderDetails()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
         updateOrderDetails()
 
-//        // Set submitButton text
 //        updateSubmitButtonText()
     }
 
@@ -110,10 +134,9 @@ class OrderActivity : AppCompatActivity() {
         val deliveryCost = calculateDeliveryCost()
         val total = subtotal + deliveryCost
 
-        // Update UI with calculated values
-        textSubtotal.text = String.format("Rp. %.2f", subtotal)
-        textDelivery.text = String.format("Rp. %.2f", deliveryCost)
-        textTotal.text = String.format("Rp. %.2f", total)
+        textSubtotal.text = String.format("Rp. %.0f", subtotal)
+        textDelivery.text = String.format("Rp. %.0f", deliveryCost)
+        textTotal.text = String.format("Rp. %.0f", total)
     }
     private fun calculateSubtotal(products: List<Product>): Double {
         var subtotal = 0.0
@@ -124,10 +147,15 @@ class OrderActivity : AppCompatActivity() {
     }
 
     private fun calculateDeliveryCost(): Double {
-        return if (switchDelivery.isChecked) {
-            11000.0
-        } else {
-            0.0
+        val selectedArea = areaSpinner.selectedItem.toString()
+        return when (selectedArea) {
+            "Bandung Barat" -> 10000.0
+            "Bandung Timur" -> 11000.0
+            "Bandung Utara" -> 12000.0
+            "Bandung Selatan" -> 13000.0
+            "Bandung Tengah" -> 14000.0
+            "Kabupaten Bandung" -> 15000.0
+            else -> 0.0 // Default case
         }
     }
 
@@ -168,7 +196,22 @@ class OrderActivity : AppCompatActivity() {
         val productQuantityTextView: TextView = itemView.findViewById(R.id.quantityTextView)
     }
 
-    private fun submitOrder() {
+    private fun showPaymentTypeDialog() {
+        val paymentOptions = arrayOf("Bayar Via Transfer", "Bayar COD")
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Pilih Metode Pembayaran")
+        builder.setItems(paymentOptions) { _, which ->
+            val paymentType = if (which == 0) {
+                "transfer"
+            } else {
+                "COD"
+            }
+            submitOrder(paymentType)
+        }
+        builder.show()
+    }
+
+    private fun submitOrder(paymentType: String) {
         showLoading() // Show loading
         // Calculate subtotal, delivery cost, and total
         val subtotal = calculateSubtotal(selectedProducts)
@@ -192,7 +235,11 @@ class OrderActivity : AppCompatActivity() {
         val address = editAddress.text.toString()
         val zipCode = editZIP.text.toString()
         val notes = editNotes.text.toString()
-        val status = "Sedang diproses"
+        var status = "Sedang diproses"
+
+        if(paymentType == "COD"){
+            status = "Selesai Pembayaran"
+        }
 
         val orderData = mapOf(
             "userId" to uid,
@@ -206,6 +253,7 @@ class OrderActivity : AppCompatActivity() {
             "zipCode" to zipCode,
             "notes" to notes,
             "status" to status,
+            "paymentType" to paymentType,
             // Add other order details as needed
             // For example, you can add products data from the list
             "products" to selectedProducts.map { product ->
@@ -226,12 +274,21 @@ class OrderActivity : AppCompatActivity() {
                 val orderId = documentReference.id // Get the orderId from the document reference
                 Toast.makeText(this, "Success add item to cart", Toast.LENGTH_SHORT).show()
                 clearProductsSharedPreferences()
-                val intent = Intent(this, PaymentActivity::class.java)
-                intent.putExtra("orderId", orderId) // Pass the orderId to the PaymentActivity intent
-                intent.putExtra("subtotal", subtotal)
-                intent.putExtra("deliveryCost", deliveryCost)
-                intent.putExtra("total", total)
-                startActivity(intent)
+                if(paymentType == "transfer"){
+                    val intent = Intent(this, PaymentActivity::class.java)
+                    intent.putExtra("orderId", orderId) // Pass the orderId to the PaymentActivity intent
+                    intent.putExtra("subtotal", subtotal)
+                    intent.putExtra("deliveryCost", deliveryCost)
+                    intent.putExtra("total", total)
+                    startActivity(intent)
+                    finish()
+                }else{
+                    val intent = Intent(this, HistoryActivity::class.java)
+                    intent.putExtra("tabName", "Sedang diproses")
+                    startActivity(intent)
+                    finish()
+                }
+
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to add item to cart", Toast.LENGTH_SHORT).show()

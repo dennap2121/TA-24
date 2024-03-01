@@ -159,6 +159,22 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
+                <TextView
+                    android:id="@+id/textArea"
+                    android:textColor="#32647B"
+                    android:fontFamily="@font/poppins"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pilih Area"
+                    android:textSize="16sp"
+                    android:layout_marginTop="16dp"/>
+
+                <Spinner
+                    android:id="@+id/areaSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"/>
+
             </LinearLayout>
 
             <!-- Product RecyclerView -->

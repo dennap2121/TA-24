@@ -111,7 +111,9 @@ class TransactionsActivity : AppCompatActivity() {
                     val orderAddress = document.getString("address") ?: ""
                     val orderNotes = document.getString("notes") ?: ""
                     val orderStatus = document.getString("status") ?: ""
-
+                    val orderPaymentImage = document.getString("buktiPembayaran") ?: ""
+                    val orderPaymentPayment = document.getString("paymentType") ?: ""
+                    val orderRejectReason = document.getString("rejectReason") ?: ""
 
                     val orderProducts = document.get("products") as? List<HashMap<String, Any>>
                     val productList = orderProducts?.map {
@@ -124,7 +126,7 @@ class TransactionsActivity : AppCompatActivity() {
                     } ?: emptyList()
 
                     val order = Order(orderId, orderDeliveryType, orderTotal,
-                        orderCreatedAt!!, productList, orderPengiriman, orderSubtotal, orderName, orderUserId, orderAddress, orderNotes, orderStatus)
+                        orderCreatedAt!!, productList, orderPengiriman, orderSubtotal, orderName, orderUserId, orderAddress, orderNotes, orderStatus, orderPaymentImage, orderPaymentPayment, orderRejectReason)
                     transactionList.add(order)
                 }
                 transactionAdapter.notifyDataSetChanged()

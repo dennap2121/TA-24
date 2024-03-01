@@ -8,7 +8,8 @@ data class Product(
     var quantity: Int = 0,
     val description: String = "",
     val image: String = "",
-    val category: String = ""
+    val category: String = "",
+    val isRecommended: Boolean = false // Added isRecommended field
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
@@ -17,7 +18,8 @@ data class Product(
         parcel.readInt(),
         parcel.readString() ?: "",
         parcel.readString() ?: "",
-        parcel.readString() ?: ""
+        parcel.readString() ?: "",
+        parcel.readByte() != 0.toByte() // Read isRecommended as a Boolean
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -28,6 +30,7 @@ data class Product(
         parcel.writeString(description)
         parcel.writeString(image)
         parcel.writeString(category)
+        parcel.writeByte(if (isRecommended) 1 else 0) // Write isRecommended as a Byte
     }
 
     override fun describeContents(): Int {

@@ -8,12 +8,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -123,9 +125,13 @@ class HistoryActivity : AppCompatActivity() {
         if (uid != null) {
             val db = FirebaseFirestore.getInstance()
             val query = if (tabName == "Sedang diproses") {
-                db.collection("orders").whereEqualTo("userId", uid).whereEqualTo("status", "Sedang diproses")
+                db.collection("orders").whereEqualTo("userId", uid)
+                    .whereIn("status", listOf("Sedang diproses", "Selesai Pembayaran", "Proses Pengiriman"))
             } else {
-                db.collection("orders").whereEqualTo("userId", uid).whereEqualTo("status", "Selesai")
+                db.collection("orders")
+                    .whereEqualTo("userId", uid)
+                    .whereIn("status", listOf("Selesai", "Ditolak"))
+
             }
             query.get()
                 .addOnSuccessListener { documents ->
@@ -143,7 +149,9 @@ class HistoryActivity : AppCompatActivity() {
                         val orderAddress = document.getString("address") ?: ""
                         val orderNotes = document.getString("notes") ?: ""
                         val orderStatus = document.getString("status") ?: ""
-
+                        val orderPaymentImage = document.getString("buktiPembayaran") ?: ""
+                        val orderPaymentType = document.getString("paymentType") ?: ""
+                        val orderRejectReason = document.getString("rejectReason") ?: ""
 
                         val orderProducts = document.get("products") as? List<HashMap<String, Any>>
                         val productList = orderProducts?.map {
@@ -156,7 +164,7 @@ class HistoryActivity : AppCompatActivity() {
                         } ?: emptyList()
 
                         val order = Order(orderId, orderDeliveryType, orderTotal,
-                            orderCreatedAt!!, productList, orderPengiriman, orderSubtotal, orderName, orderUserId, orderAddress, orderNotes, orderStatus)
+                            orderCreatedAt!!, productList, orderPengiriman, orderSubtotal, orderName, orderUserId, orderAddress, orderNotes, orderStatus, orderPaymentImage, orderPaymentType, orderRejectReason)
                         orderList.add(order)
                     }
                     // Call a function to display or process the order list
@@ -219,6 +227,13 @@ class HistoryActivity : AppCompatActivity() {
                 holder.orderDeliveryTypeView.setBackgroundResource(R.drawable.green_border) // Set blue border background
             }
 
+            if(order.status == "Ditolak"){
+                holder.orderRejectTextView.visibility = View.VISIBLE
+                holder.orderRejectReasonTextView.visibility = View.VISIBLE
+                holder.orderRejectReasonTextView.text = order.rejectReason
+                holder.orderRejectTextView.text = "Ditolak"
+            }
+
             // Add click listener to the item
             holder.itemView.setOnClickListener {
                 if (tabName == "Sedang diproses") {
@@ -226,22 +241,63 @@ class HistoryActivity : AppCompatActivity() {
                     val subtotal = order.subtotal
                     val deliveryCost = order.pengiriman
                     val total = subtotal + deliveryCost
-                    // Launch PaymentActivity with necessary data
-                    val intent = Intent(context, PaymentActivity::class.java).apply {
-                        putExtra("orderId", orderId)
-                        putExtra("subtotal", subtotal)
-                        putExtra("deliveryCost", deliveryCost)
-                        putExtra("total", total)
+                    if (order.paymentImage != null && order.paymentImage.isNotBlank()) {
+                        // Payment image exists, show popup
+                        showPaymentProofPopup(order.paymentImage)
+                    } else if(order.paymentType == "COD"){
+
+                    } else {
+                        // Payment image does not exist, launch PaymentActivity
+                        val intent = Intent(context, PaymentActivity::class.java).apply {
+                            putExtra("orderId", orderId)
+                            putExtra("subtotal", subtotal)
+                            putExtra("deliveryCost", deliveryCost)
+                            putExtra("total", total)
+                        }
+                        context.startActivity(intent)
                     }
-                    context.startActivity(intent)
                 }else{
-                    val orderId = order.id // Get the orderId for the clicked item
-                    // Launch ReceiptActivity with necessary data
-                    val intent = Intent(context, ReceiptActivity::class.java).apply {
-                        putExtra("orderId", orderId)
+                    if(order.status != "Ditolak"){
+                        val orderId = order.id // Get the orderId for the clicked item
+                        // Launch ReceiptActivity with necessary data
+                        val intent = Intent(context, ReceiptActivity::class.java).apply {
+                            putExtra("orderId", orderId)
+                        }
+                        context.startActivity(intent)
                     }
-                    context.startActivity(intent)
                 }
+            }
+        }
+
+        private fun showPaymentProofPopup(paymentImageUri: String) {
+            // Inflate the layout for the popup
+            val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val popupView = inflater.inflate(R.layout.popup_payment_proof, null)
+            val closeButton = popupView.findViewById<Button>(R.id.closeButton)
+
+            // Initialize the popup window
+            val width = LinearLayout.LayoutParams.MATCH_PARENT
+            val height = LinearLayout.LayoutParams.MATCH_PARENT
+            val focusable = true // Show popup window with focusable controls
+            val popupWindow = PopupWindow(popupView, width, height, focusable)
+
+            // Set the payment proof image
+            val paymentProofImageView = popupView.findViewById<ImageView>(R.id.paymentProofImageView)
+            Glide.with(context)
+                .load(paymentImageUri)
+                .into(paymentProofImageView)
+
+            // Set a dismiss listener for the popup window
+            popupWindow.setOnDismissListener {
+                // Handle popup dismiss event if needed
+            }
+
+            // Show the popup window
+            popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0)
+
+            closeButton.setOnClickListener {
+                // Dismiss the popup window when the close button is clicked
+                popupWindow.dismiss()
             }
         }
 
@@ -256,6 +312,8 @@ class HistoryActivity : AppCompatActivity() {
         val orderProductTextView: TextView = itemView.findViewById(R.id.orderProductTextView)
         val orderTotalTextView: TextView = itemView.findViewById(R.id.orderTotalTextView)
         val orderNumberTextView: TextView = itemView.findViewById(R.id.orderNumberTextView)
+        val orderRejectTextView: TextView = itemView.findViewById(R.id.orderRejectTextView)
+        val orderRejectReasonTextView: TextView = itemView.findViewById(R.id.orderRejectReasonTextView)
     }
 
     private fun showLoading() {

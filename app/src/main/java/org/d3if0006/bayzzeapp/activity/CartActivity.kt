@@ -63,11 +63,75 @@ class CartActivity : AppCompatActivity() {
 
         selectedProducts = getSelectedProductsFromSharedPreferences()
 
-        val adapter = CartProductAdapter(selectedProducts, this::updateToCart)
+        if (selectedProducts.isEmpty()) {
+            // Show the empty cart message and hide the RecyclerView
+            binding.emptyCart.visibility = View.VISIBLE
+            binding.cartRecyclerView.visibility = View.GONE
+            binding.floatingButton.visibility = View.GONE
+            // Set orderNowButton to search activity
+            binding.orderNowButton.setOnClickListener {
+                val intent = Intent(this, SearchActivity::class.java)
+                intent.putExtra("searchName", "")
+                startActivity(intent)
+                finish()
+            }
+        } else {
+            // Hide the empty cart message and show the RecyclerView
+            binding.emptyCart.visibility = View.GONE
+            binding.cartRecyclerView.visibility = View.VISIBLE
+            val adapter = CartProductAdapter(selectedProducts, this::updateToCart, this::deleteProduct)
+            cartRecyclerView = findViewById(R.id.cartRecyclerView)
+            cartRecyclerView.layoutManager = LinearLayoutManager(this)
+            cartRecyclerView.adapter = adapter
+        }
+
+        val adapter = CartProductAdapter(selectedProducts, this::updateToCart, this::deleteProduct)
 
         cartRecyclerView = findViewById(R.id.cartRecyclerView)
         cartRecyclerView.layoutManager = LinearLayoutManager(this)
         cartRecyclerView.adapter = adapter
+    }
+
+    private fun deleteProduct(product: Product) {
+        // Remove the product from the selectedProducts list
+        selectedProducts.remove(product)
+
+        // Update the SharedPreferences to reflect the changes
+        saveSelectedProductsToSharedPreferences(selectedProducts)
+
+        // Notify the adapter that the data set has changed
+        val adapter = cartRecyclerView.adapter as? CartProductAdapter
+        adapter?.notifyDataSetChanged()
+
+        if (selectedProducts.isEmpty()) {
+            // Show the empty cart message and hide the RecyclerView
+            binding.emptyCart.visibility = View.VISIBLE
+            binding.cartRecyclerView.visibility = View.GONE
+            binding.floatingButton.visibility = View.GONE
+            // Set orderNowButton to search activity
+            binding.orderNowButton.setOnClickListener {
+                val intent = Intent(this, SearchActivity::class.java)
+                intent.putExtra("searchName", "")
+                startActivity(intent)
+                finish()
+            }
+        } else {
+            // Hide the empty cart message and show the RecyclerView
+            binding.emptyCart.visibility = View.GONE
+            binding.cartRecyclerView.visibility = View.VISIBLE
+            val adapter = CartProductAdapter(selectedProducts, this::updateToCart, this::deleteProduct)
+            cartRecyclerView = findViewById(R.id.cartRecyclerView)
+            cartRecyclerView.layoutManager = LinearLayoutManager(this)
+            cartRecyclerView.adapter = adapter
+        }
+    }
+
+    private fun saveSelectedProductsToSharedPreferences(products: List<Product>) {
+        val sharedPreferences = getSharedPreferences("products", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        // Serialize the list of products to JSON using Gson and save it to SharedPreferences
+        editor.putString("productList", Gson().toJson(products))
+        editor.apply()
     }
 
     private fun getSelectedProductsFromSharedPreferences(): MutableList<Product> {
@@ -117,7 +181,8 @@ class CartActivity : AppCompatActivity() {
 
     class CartProductAdapter(
         private val productList: List<Product>,
-        private val onUpdateToCart: (Product) -> Unit
+        private val onUpdateToCart: (Product) -> Unit,
+        private val onDeleteProduct: (Product) -> Unit
         ) : RecyclerView.Adapter<CartViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartViewHolder {
@@ -147,6 +212,9 @@ class CartActivity : AppCompatActivity() {
                 holder.decrementQuantity()
                 product.quantity--
                 onUpdateToCart(product)
+            }
+            holder.itemView.findViewById<ImageButton>(R.id.deleteButton).setOnClickListener {
+                onDeleteProduct(product)
             }
         }
 

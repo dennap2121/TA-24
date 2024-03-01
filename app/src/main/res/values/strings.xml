@@ -5,4 +5,10 @@
     <string name="subtotal_label">Subtotal: Rp %1$s</string>
     <string name="delivery_charge_label">Delivery Charge: Rp %1$s</string>
     <string name="total_label">Total: Rp %1$s</string>
+    <string name="instagram_username">Bayzee</string>
+    <string name="facebook_username">Bayzee</string>
+    <string name="whatsapp_number">+6287821790333</string>
+    <string name="store_address">Jalan Surapati no 1</string>
+
+
 </resources>
