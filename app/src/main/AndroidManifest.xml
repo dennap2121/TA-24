@@ -136,6 +136,18 @@
             android:name=".activity.ManageCategoryActivity"
             android:exported="true"
             android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.ConfigCategoryActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.ReportActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
+        <activity
+            android:name=".activity.ExpiredActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BayzzeApp" />
 
         <meta-data
             android:name="preloaded_fonts"

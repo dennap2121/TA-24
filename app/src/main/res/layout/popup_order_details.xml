@@ -149,4 +149,32 @@
             android:textSize="16sp"/>
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/poppins"
+            android:textColor="@color/black"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/buktiTransferTextView"
+            android:layout_width="0dp"
+            android:text="Lihat Bukti Transfer"
+            android:textAlignment="textEnd"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/poppins"
+            android:textColor="@color/sage_500"
+            android:textSize="12sp"/>
+
+    </LinearLayout>
+
 </LinearLayout>

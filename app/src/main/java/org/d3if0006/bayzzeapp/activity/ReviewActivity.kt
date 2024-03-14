@@ -16,6 +16,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import org.d3if0006.bayzzeapp.R
 import org.d3if0006.bayzzeapp.databinding.ActivityReviewBinding
 import java.text.NumberFormat
@@ -36,6 +38,7 @@ class ReviewActivity : AppCompatActivity() {
     private lateinit var reviewList: MutableList<Review>
     private lateinit var reviewRecyclerView: RecyclerView
     private lateinit var isAdmin: String
+    private lateinit var name: String
 
     companion object {
         private const val ADD_REVIEW_REQUEST_CODE = 100
@@ -44,11 +47,13 @@ class ReviewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        progressDialog = ProgressDialog(this) // Initialize ProgressDialog
+        progressDialog = ProgressDialog(this)
 
-        isAdmin = intent.getStringExtra("isAdmin") ?: ""
+        isAdmin = intent.getStringExtra("isAdmin") ?: "eeee"
 
-        fetchReviewData()
+        name = ""
+
+        loadUserProfile()
 
         binding = ActivityReviewBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -71,10 +76,37 @@ class ReviewActivity : AppCompatActivity() {
         startActivityForResult(intent, ADD_REVIEW_REQUEST_CODE)
     }
 
+    private fun loadUserProfile() {
+        val db = FirebaseFirestore.getInstance()
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        if (uid != null) {
+            showLoading()
+            val userRef = db.collection("user_info").document(uid)
+            userRef.get()
+                .addOnSuccessListener { document ->
+                    hideLoading()
+                    if (document.exists()) {
+                        val userProfile = document.toObject(ProfileActivity.UserProfile::class.java)
+                        if (userProfile != null) {
+                            // Populate the UI with user profile data
+                            name = userProfile.name
+                            fetchReviewData()
+                        }
+                    } else {
+                        Log.d("ggwp", "No such document")
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.d("ggwp", "get failed with ", exception)
+                }
+        }
+    }
+
     private fun fetchReviewData() {
         showLoading()
         val db = FirebaseFirestore.getInstance()
         val query = db.collection("reviews")
+            .orderBy("date", Query.Direction.ASCENDING)
         query.get()
             .addOnSuccessListener { documents ->
                 hideLoading()
@@ -94,7 +126,8 @@ class ReviewActivity : AppCompatActivity() {
                 val adapter = ReviewAdapter(
                     reviewList,
                     this,
-                    isAdmin
+                    isAdmin,
+                    name
                 ) // Pass tabName to adapter
                 reviewRecyclerView.adapter = adapter
             }
@@ -108,9 +141,10 @@ class ReviewActivity : AppCompatActivity() {
     }
 
     class ReviewAdapter(
-        private val reviewList: List<Review>,
+        private var reviewList: List<Review>,
         private val context: Context,
-        private val isAdmin: String
+        private val isAdmin: String,
+        private val name: String
     ) : RecyclerView.Adapter<ReviewViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReviewViewHolder {
@@ -125,6 +159,15 @@ class ReviewActivity : AppCompatActivity() {
             holder.reviewNameTextView.text = review.name
             holder.reviewDateTextView.text = review.date
             holder.reviewReviewTextView.text = review.review
+
+
+            if(review.name == name){
+                holder.deleteButton.visibility = View.VISIBLE
+            }
+
+            holder.deleteButton.setOnClickListener {
+                showDeleteConfirmationDialog(review.id, position)
+            }
 
             val comments = review.comments
             if (comments != null && comments.isNotEmpty()) {
@@ -146,7 +189,7 @@ class ReviewActivity : AppCompatActivity() {
                 val commentText = holder.reviewCommentEditText.text.toString().trim()
 
                 if (commentText.isNotEmpty()) {
-                    addCommentToFirestore(review.id, commentText, isAdmin)
+                    addCommentToFirestore(review.id, commentText, isAdmin, position)
                     holder.reviewCommentEditText.text.clear()
                 } else {
                     Toast.makeText(context, "Comment cannot be empty", Toast.LENGTH_SHORT).show()
@@ -158,7 +201,36 @@ class ReviewActivity : AppCompatActivity() {
             return reviewList.size
         }
 
-        private fun addCommentToFirestore(id: String, commentText: String, isAdmin: String) {
+        private fun showDeleteConfirmationDialog(reviewId: String, position: Int) {
+            val alertDialogBuilder = AlertDialog.Builder(context)
+            alertDialogBuilder.setTitle("Delete Review")
+            alertDialogBuilder.setMessage("Are you sure you want to delete this review?")
+            alertDialogBuilder.setPositiveButton("Delete") { _, _ ->
+                deleteReview(reviewId, position)
+            }
+            alertDialogBuilder.setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            val alertDialog = alertDialogBuilder.create()
+            alertDialog.show()
+        }
+
+        private fun deleteReview(reviewId: String, position: Int) {
+            val db = FirebaseFirestore.getInstance()
+            val batch = db.batch()
+            val reviewRef = db.collection("reviews").document(reviewId)
+            reviewRef.delete()
+                .addOnSuccessListener {
+                    batch.delete(reviewRef)
+                    notifyItemRemoved(position)
+                    Toast.makeText(context, "Review deleted successfully", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(context, "Error deleting review: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+
+        private fun addCommentToFirestore(id: String, commentText: String, isAdmin: String, position: Int) {
             val db = FirebaseFirestore.getInstance()
             val reviewRef = db.collection("reviews")
             val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -171,13 +243,13 @@ class ReviewActivity : AppCompatActivity() {
                             if (userProfile != null) {
                                 // Populate the UI with user profile data
 
-                                var name = userProfile.name
+                                var name = "admin"
 
                                 Log.d("plm", isAdmin)
 
-                                if(isAdmin != "" || isAdmin != null){
+                                if(isAdmin != "admin"){
                                     Log.d("plm", "isNotAdmin")
-                                    name = "admin"
+                                    name = userProfile.name
                                 }
 
                                 val newComment = hashMapOf(
@@ -188,6 +260,7 @@ class ReviewActivity : AppCompatActivity() {
                                 // Update Firestore document with new comment
                                 reviewRef.document(id).update("comments", FieldValue.arrayUnion(newComment))
                                     .addOnSuccessListener {
+                                        fetchReviewData()
                                         Toast.makeText(context, "Comment added successfully", Toast.LENGTH_SHORT).show()
                                     }
                                     .addOnFailureListener { e ->
@@ -206,6 +279,33 @@ class ReviewActivity : AppCompatActivity() {
 
         }
 
+        private fun fetchReviewData() {
+            val db = FirebaseFirestore.getInstance()
+            val query = db.collection("reviews")
+                .orderBy("date", Query.Direction.ASCENDING)
+            query.get()
+                .addOnSuccessListener { documents ->
+                    var reviewListRaw = mutableListOf<Review>()
+                    for (document in documents) {
+                        val reviewId = document.id
+                        val reviewName = document.getString("name") ?: "-"
+                        val reviewDate = document.getString("date") ?: "01/01/2020"
+                        val reviewReview = document.getString("review") ?: "-"
+                        val reviewComments = document.get("comments") as? List<HashMap<String, String>>
+
+                        val review = Review(reviewId, reviewName, reviewDate, reviewReview, reviewComments)
+                        reviewListRaw.add(review)
+                    }
+
+                    reviewList = reviewListRaw
+
+                    notifyDataSetChanged()
+                }
+                .addOnFailureListener { exception ->
+                    Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                }
+        }
+
     }
 
     class ReviewViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -216,6 +316,7 @@ class ReviewActivity : AppCompatActivity() {
         val reviewSendIconImageView: ImageButton = itemView.findViewById(R.id.reviewSendIconImageView)
         val commentAuthorTextView: TextView = itemView.findViewById(R.id.commentAuthorTextView)
         val commentContentTextView: TextView = itemView.findViewById(R.id.commentContentTextView)
+        val deleteButton: ImageButton = itemView.findViewById(R.id.deleteButton)
     }
 
     private fun showLoading() {

@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,8 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.PopupMenu
+import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -31,11 +34,14 @@ import com.google.android.material.tabs.TabLayout
 import com.google.common.reflect.TypeToken
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.gson.Gson
 import org.d3if0006.bayzzeapp.R
 import org.d3if0006.bayzzeapp.databinding.ActivityDeliveryBinding
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 class DeliveryActivity : AppCompatActivity() {
@@ -58,12 +64,12 @@ class DeliveryActivity : AppCompatActivity() {
         val tabName = intent.getStringExtra("tabName")
 
         // Fetch delivery data from Firestore
-        fetchDeliveryData(tabName!!)
+        fetchDeliveryData("Ambil ke Toko", "")
 
 
         // Add tabs
         val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
-        val tabs = listOf("Permintaan", "Selesai")
+        val tabs = listOf("Ambil ke Toko", "Dikirim Toko", "Selesai")
         tabs.forEach { tab ->
             tabLayout.addTab(tabLayout.newTab().setText(tab))
         }
@@ -78,7 +84,7 @@ class DeliveryActivity : AppCompatActivity() {
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 val selectedTabText = tab.text.toString()
-                fetchDeliveryData(selectedTabText)
+                fetchDeliveryData(selectedTabText, "")
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
@@ -100,7 +106,7 @@ class DeliveryActivity : AppCompatActivity() {
                 }
                 R.id.nav_pengiriman -> {
                     val intent = Intent(this, DeliveryActivity::class.java)
-                    intent.putExtra("tabName", "Permintaan")
+                    intent.putExtra("tabName", "Ambil ke Toko")
                     startActivity(intent)
                     true
                 }
@@ -118,21 +124,74 @@ class DeliveryActivity : AppCompatActivity() {
             }
         }
 
+        binding.openPopup.setOnClickListener {
+            // Show popup with months as options
+            val popup = PopupMenu(this, it)
+            val months = arrayOf("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+            for (month in months) {
+                popup.menu.add(month)
+            }
+            popup.setOnMenuItemClickListener { menuItem ->
+                // When a month is clicked, fetch delivery data with the selected month
+                fetchDeliveryData("Selesai", menuItem.title.toString())
+                true
+            }
+            popup.show()
+        }
+
 
         // Initialize RecyclerView
         orderRecyclerView = findViewById(R.id.deliveryRecyclerView)
         orderRecyclerView.layoutManager = LinearLayoutManager(this)
     }
 
-    private fun fetchDeliveryData(tabName: String) {
+    private fun fetchDeliveryData(tabName: String, month: String) {
         showLoading()
         val db = FirebaseFirestore.getInstance()
-        val query = if (tabName == "Permintaan") {
+        val query = if (tabName == "Ambil ke Toko") {
+            binding.headerLayout.visibility = View.GONE
             db.collection("orders")
                 .whereIn("status", listOf("Selesai Pembayaran", "Proses Pengiriman"))
-        } else {
+                .whereEqualTo("deliveryType", "Ambil ke Toko")
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+        } else if (tabName == "Dikirim Toko") {
+            binding.headerLayout.visibility = View.GONE
             db.collection("orders")
-                .whereIn("status", listOf("Selesai", "Ditolak"))
+                .whereIn("status", listOf("Selesai Pembayaran", "Proses Pengiriman"))
+                .whereEqualTo("deliveryType", "Diantar Toko")
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+        } else {
+            binding.headerLayout.visibility = View.VISIBLE
+            if(month != ""){
+                binding.titleTextView.text = month
+                val calendar = Calendar.getInstance()
+                val currentYear = calendar.get(Calendar.YEAR)
+
+                // Parse the provided month string and set the year to the current year
+                val selectedMonthCalendar = Calendar.getInstance()
+                selectedMonthCalendar.time = SimpleDateFormat("MMMM", Locale.getDefault()).parse(month) ?: Date()
+                selectedMonthCalendar.set(Calendar.YEAR, currentYear)
+
+                // Set the start date of the selected month
+                selectedMonthCalendar.set(Calendar.DAY_OF_MONTH, 1)
+                val startOfMonth = selectedMonthCalendar.time
+
+                // Set the end date of the selected month
+                selectedMonthCalendar.add(Calendar.MONTH, 1)
+                selectedMonthCalendar.add(Calendar.DAY_OF_MONTH, -1)
+                val endOfMonth = selectedMonthCalendar.time
+
+                // Query documents where the createdAt field falls within the selected month
+                db.collection("orders")
+                    .whereIn("status", listOf("Selesai", "Ditolak"))
+                    .whereGreaterThanOrEqualTo("createdAt", startOfMonth)
+                    .whereLessThanOrEqualTo("createdAt", endOfMonth)
+                    .orderBy("createdAt", Query.Direction.DESCENDING)
+            } else {
+                db.collection("orders")
+                    .whereIn("status", listOf("Selesai", "Ditolak"))
+                    .orderBy("createdAt", Query.Direction.DESCENDING)
+            }
         }
         query.get()
             .addOnSuccessListener { documents ->
@@ -211,6 +270,38 @@ class DeliveryActivity : AppCompatActivity() {
             return OrderViewHolder(view)
         }
 
+        private fun showPaymentProofPopup(paymentImageUri: String) {
+            // Inflate the layout for the popup
+            val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val popupView = inflater.inflate(R.layout.popup_payment_proof, null)
+            val closeButton = popupView.findViewById<Button>(R.id.closeButton)
+
+            // Initialize the popup window
+            val width = LinearLayout.LayoutParams.MATCH_PARENT
+            val height = LinearLayout.LayoutParams.MATCH_PARENT
+            val focusable = true // Show popup window with focusable controls
+            val popupWindow = PopupWindow(popupView, width, height, focusable)
+
+            // Set the payment proof image
+            val paymentProofImageView = popupView.findViewById<ImageView>(R.id.paymentProofImageView)
+            Glide.with(context)
+                .load(paymentImageUri)
+                .into(paymentProofImageView)
+
+            // Set a dismiss listener for the popup window
+            popupWindow.setOnDismissListener {
+                // Handle popup dismiss event if needed
+            }
+
+            // Show the popup window
+            popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0)
+
+            closeButton.setOnClickListener {
+                // Dismiss the popup window when the close button is clicked
+                popupWindow.dismiss()
+            }
+        }
+
         override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {
             val order = orderList[position]
 
@@ -238,8 +329,11 @@ class DeliveryActivity : AppCompatActivity() {
                 holder.deliveryTerimaTextView.setBackgroundResource(R.drawable.red_border) // Set red border background
             }
 
+            val dateFormat = SimpleDateFormat("d MMM yyyy HH:mm", Locale.getDefault())
+            val formattedDate = dateFormat.format(order.createdAt)
+
             holder.deliveryNameTextView.text = order.name
-            holder.deliveryTimeTextView.text = formatTimestampStringToTime(order.createdAt.toString())
+            holder.deliveryTimeTextView.text = formattedDate
 
             val products = order.products
             if (products != null && products.isNotEmpty()) {
@@ -260,6 +354,8 @@ class DeliveryActivity : AppCompatActivity() {
                 holder.deliveryProductTotalTextView.visibility = View.GONE
             }
 
+
+
             holder.deliveryDetailTextView.setOnClickListener{
                 val dialog = Dialog(holder.itemView.context)
                 dialog.setContentView(R.layout.popup_order_details) // Set custom layout for the dialog
@@ -273,6 +369,7 @@ class DeliveryActivity : AppCompatActivity() {
                 val totalTextView: TextView = dialog.findViewById(R.id.totalTextView)
                 val deliveryChargeTextView: TextView = dialog.findViewById(R.id.deliveryChargeTextView)
                 val subtotalTextView: TextView = dialog.findViewById(R.id.subtotalTextView)
+                val buktiTransferTextView: TextView = dialog.findViewById(R.id.buktiTransferTextView)
 
                 // Set title
                 titleTextView.text = "Alamat Penjemputan"
@@ -309,10 +406,21 @@ class DeliveryActivity : AppCompatActivity() {
 //                productsTextView.text = productsString.toString()
 
                 // Set total, delivery charge, and subtotal
-                totalTextView.text = "${formatCurrency(order.total)}"
-                deliveryChargeTextView.text = "${formatCurrency(order.pengiriman)}"
-                subtotalTextView.text = "${formatCurrency(order.subtotal)}"
+                totalTextView.text = "${formatCurrency(order.total)}".replace(",00", "")
+                deliveryChargeTextView.text = "${formatCurrency(order.pengiriman)}".replace(",00", "")
+                subtotalTextView.text = "${formatCurrency(order.subtotal)}".replace(",00", "")
 
+                buktiTransferTextView.setOnClickListener{
+                    val orderId = order.id // Get the orderId for the clicked item
+                    val subtotal = order.subtotal
+                    val deliveryCost = order.pengiriman
+                    val total = subtotal + deliveryCost
+                    if (order.paymentImage != null && order.paymentImage.isNotBlank()) {
+                        showPaymentProofPopup(order.paymentImage)
+                        dialog.hide()
+
+                    }
+                }
                 // Show the dialog
                 dialog.show()
             }

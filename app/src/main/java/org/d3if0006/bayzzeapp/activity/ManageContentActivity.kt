@@ -51,7 +51,7 @@ class ManageContentActivity : AppCompatActivity() {
     private lateinit var binding: ActivityManageContentBinding
     private lateinit var contentRecyclerView: RecyclerView
     private lateinit var contentList: MutableList<Content>
-    private lateinit var progressDialog: ProgressDialog // Declare ProgressDialog
+    private lateinit var progressDialog: ProgressDialog
     private lateinit var emptyStateImageView: ImageView
     private lateinit var selectedTabText: String
     private val CREATE_DOCUMENT_REQUEST = 123

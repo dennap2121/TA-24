@@ -6,6 +6,7 @@
     android:orientation="vertical"
     android:background="@drawable/card_background"
     android:layout_margin="20dp"
+    android:elevation="4dp"
     android:padding="16dp">
 
     <LinearLayout
@@ -48,6 +49,21 @@
                 android:text="Hari ini 13.00" />
 
         </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/deleteButton"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/icon_delete_2"
+            android:background="@color/white"
+            android:layout_marginEnd="10dp"
+            android:visibility="gone"
+            android:stateListAnimator="@null" />
 
 
     </LinearLayout>
@@ -108,7 +124,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textColor="@color/black"
-            android:textColorHint="@color/black"
+            android:textColorHint="@color/grey_font"
             android:hint="Tambahkan komentar anda"
             android:padding="10dp" />
 

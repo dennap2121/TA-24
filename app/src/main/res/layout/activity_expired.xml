@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp"
-    tools:context=".activity.TransactionsActivity">
+    tools:context=".activity.ExpiredActivity">
 
     <RelativeLayout
         android:id="@+id/headerLayout"
@@ -13,14 +13,7 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:padding="16dp">
-        <ImageButton
-            android:id="@+id/backButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/icon_back_green"
-            android:background="?android:attr/selectableItemBackground"
-            android:padding="8dp"
-            android:contentDescription="Back" />
+
 
         <TextView
             android:id="@+id/titleTextView"
@@ -28,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:fontFamily="@font/poppins"
-            android:text="Pengguna"
+            android:text="Expired"
             android:textColor="#32647B"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -41,41 +34,25 @@
             android:layout_alignParentEnd="true"/>
     </RelativeLayout>
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/materialCardView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="12dp"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_below="@id/headerLayout">
-
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:iconifiedByDefault="false"
-            app:queryBackground="@android:color/transparent"
-            app:queryHint="Cari.." />
-
-    </com.google.android.material.card.MaterialCardView>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/header"
         android:padding="16dp"
         android:background="@color/grey_font"
-        android:layout_below="@id/materialCardView"
+        android:layout_below="@id/headerLayout"
         android:orientation="horizontal">
 
         <TextView
             android:text="No"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins"
+            android:textColor="@color/black"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:text="Nama"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins"
@@ -84,7 +61,7 @@
             android:textSize="16sp"/>
 
         <TextView
-            android:text="Email"
+            android:text="Tanggal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins"
@@ -93,7 +70,6 @@
             android:textSize="16sp"/>
 
         <TextView
-            android:text="Name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins"
@@ -101,22 +77,16 @@
             android:layout_weight="1"
             android:textSize="16sp"/>
 
-        <TextView
-            android:text="Phone"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/poppins"
-            android:textColor="@color/black"
-            android:layout_weight="1"
-            android:textSize="16sp"/>
+
     </LinearLayout>
 
-    <!-- RecyclerView to display transactions -->
+    <!-- RecyclerView to display reports -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewTransactions"
+        android:id="@+id/recyclerViewExpired"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/header"
         android:layout_marginTop="8dp" />
+
 
 </RelativeLayout>

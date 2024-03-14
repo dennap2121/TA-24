@@ -33,7 +33,10 @@ import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import java.io.OutputStreamWriter
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 class TransactionsActivity : AppCompatActivity() {
 
@@ -162,9 +165,17 @@ class TransactionsActivity : AppCompatActivity() {
         contentResolver.openOutputStream(uri)?.use { outputStream ->
             val csvWriter = BufferedWriter(OutputStreamWriter(outputStream))
             csvWriter.use {
-                it.write("Name, Date, Total\n")
+                it.write("Name, Date, Product, Total\n")
                 for (transaction in transactionList) {
-                    it.write("${transaction.name}, ${transaction.createdAt}, ${transaction.total}\n")
+                    var products = ""
+                    transaction.products.forEachIndexed { index, product ->
+                        if(index == 0){
+                            products = product.productName
+                        }else{
+                            products = products+" | "+product.productName
+                        }
+                    }
+                    it.write("${transaction.name}, ${transaction.createdAt}, ${products}, ${transaction.total}\n")
                 }
             }
             Toast.makeText(this, "Transactions exported to CSV", Toast.LENGTH_SHORT).show()
@@ -180,6 +191,7 @@ class TransactionsActivity : AppCompatActivity() {
             val transactionDateTextView: TextView = itemView.findViewById(R.id.transactionDateTextView)
             val transactionTotalTextView: TextView = itemView.findViewById(R.id.transactionTotalTextView)
             val transactionNoTextView: TextView = itemView.findViewById(R.id.transactionNoTextView)
+            val transactionProductsTextView: TextView = itemView.findViewById(R.id.transactionProductsTextView)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
@@ -189,14 +201,35 @@ class TransactionsActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
             val currentTransaction = transactionList[position]
-            val number = position + 1 // Calculate the pemesanan number
+            val number = position + 1
+            var products = ""
+            val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+            val formattedDate = dateFormat.format(currentTransaction.createdAt)
+
+            currentTransaction.products.forEachIndexed { index, product ->
+                if(index == 0){
+                    products = product.productName
+                }else{
+                    products = products+", "+product.productName
+                }
+            }
+
+            Log.d("poilkj", products)
 
             holder.transactionNameTextView.text = currentTransaction.name
-            holder.transactionDateTextView.text = currentTransaction.createdAt.toString()
-            holder.transactionTotalTextView.text = String.format("Rp. %.2f", currentTransaction.total)
+            holder.transactionDateTextView.text = formattedDate
+            holder.transactionTotalTextView.text = "${formatCurrency(currentTransaction.total)}".replace(",00", "")
             holder.transactionNoTextView.text = number.toString()
+            holder.transactionProductsTextView.text = products
+
 
             // Bind other transaction details to corresponding TextViews here
+        }
+
+        private fun formatCurrency(amount: Double): String {
+            val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
+            val formattedAmount = formatter.format(amount)
+            return formattedAmount.replace("$", "")
         }
 
         override fun getItemCount(): Int {

@@ -40,8 +40,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/imageView2"
-                android:paddingBottom="20dp"
-                app:srcCompat="@drawable/user_2" />
+                app:srcCompat="@drawable/btn_7" />
 
             <TextView
                 android:id="@+id/textView2"

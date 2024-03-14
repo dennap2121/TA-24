@@ -30,6 +30,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.common.reflect.TypeToken
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.gson.Gson
 import org.d3if0006.bayzzeapp.R
 import org.d3if0006.bayzzeapp.databinding.ActivityHistoryBinding
@@ -125,13 +126,15 @@ class HistoryActivity : AppCompatActivity() {
         if (uid != null) {
             val db = FirebaseFirestore.getInstance()
             val query = if (tabName == "Sedang diproses") {
-                db.collection("orders").whereEqualTo("userId", uid)
+                db.collection("orders")
+                    .whereEqualTo("userId", uid)
                     .whereIn("status", listOf("Sedang diproses", "Selesai Pembayaran", "Proses Pengiriman"))
+                    .orderBy("createdAt", Query.Direction.DESCENDING)
             } else {
                 db.collection("orders")
                     .whereEqualTo("userId", uid)
                     .whereIn("status", listOf("Selesai", "Ditolak"))
-
+                    .orderBy("createdAt", Query.Direction.DESCENDING)
             }
             query.get()
                 .addOnSuccessListener { documents ->
@@ -212,7 +215,7 @@ class HistoryActivity : AppCompatActivity() {
 
             holder.orderDateTextView.text = formattedDate
             holder.orderProductTextView.text = order.products.size.toString()
-            holder.orderTotalTextView.text = formattedTotal
+            holder.orderTotalTextView.text = formattedTotal.replace(",00", "")
             holder.orderNumberTextView.text = "Pemesanan #$pemesananNumber" // Set pemesanan number
 
             // Set the delivery type text
@@ -228,14 +231,23 @@ class HistoryActivity : AppCompatActivity() {
             }
 
             if(order.status == "Ditolak"){
-                holder.orderRejectTextView.visibility = View.VISIBLE
                 holder.orderRejectReasonTextView.visibility = View.VISIBLE
+                holder.orderRejectReasonDotTextView.visibility = View.VISIBLE
                 holder.orderRejectReasonTextView.text = order.rejectReason
-                holder.orderRejectTextView.text = "Ditolak"
+                holder.orderDeliveryTypeView.text = "Di Tolak"
+                holder.orderDeliveryTypeView.setTextColor(ContextCompat.getColor(context, R.color.red))
+                holder.orderDeliveryTypeView.setBackgroundResource(R.drawable.red_border)
+
+            }
+
+            if(order.status == "Selesai"){
+                holder.orderDeliveryTypeView.setTextColor(ContextCompat.getColor(context, R.color.green))
+                holder.orderDeliveryTypeView.setBackgroundResource(R.drawable.green_border)
+                holder.orderDeliveryTypeView.text = "Selesai"
             }
 
             // Add click listener to the item
-            holder.itemView.setOnClickListener {
+            holder.orderDetailTextView.setOnClickListener {
                 if (tabName == "Sedang diproses") {
                     val orderId = order.id // Get the orderId for the clicked item
                     val subtotal = order.subtotal
@@ -314,6 +326,8 @@ class HistoryActivity : AppCompatActivity() {
         val orderNumberTextView: TextView = itemView.findViewById(R.id.orderNumberTextView)
         val orderRejectTextView: TextView = itemView.findViewById(R.id.orderRejectTextView)
         val orderRejectReasonTextView: TextView = itemView.findViewById(R.id.orderRejectReasonTextView)
+        val orderRejectReasonDotTextView: TextView = itemView.findViewById(R.id.orderRejectReasonDotTextView)
+        val orderDetailTextView: TextView = itemView.findViewById(R.id.orderDetailTextView)
     }
 
     private fun showLoading() {

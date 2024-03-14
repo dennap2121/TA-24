@@ -94,11 +94,7 @@ class OrderActivity : AppCompatActivity() {
         }
 
         binding.submitButton.setOnClickListener{
-            if (switchDelivery.isChecked) {
-                showPaymentTypeDialog()
-            } else {
-                submitOrder("transfer")
-            }
+            showPaymentTypeDialog()
         }
 
         selectedProducts = intent.getParcelableArrayListExtra<Product>("selectedProducts") ?: mutableListOf()
@@ -197,7 +193,13 @@ class OrderActivity : AppCompatActivity() {
     }
 
     private fun showPaymentTypeDialog() {
-        val paymentOptions = arrayOf("Bayar Via Transfer", "Bayar COD")
+        var paymentOptions = arrayOf("")
+
+        if (switchDelivery.isChecked) {
+            paymentOptions = arrayOf("Bayar Via Transfer", "Bayar COD")
+        } else {
+            paymentOptions = arrayOf("Bayar Via Transfer", "Bayar Ditempat")
+        }
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Pilih Metode Pembayaran")
         builder.setItems(paymentOptions) { _, which ->
@@ -209,6 +211,21 @@ class OrderActivity : AppCompatActivity() {
             submitOrder(paymentType)
         }
         builder.show()
+    }
+
+    private fun show24HourLimitPopup() {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("Batas pengambilan 24 jam")
+            .setCancelable(false)
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+                val intent = Intent(this, HistoryActivity::class.java)
+                intent.putExtra("tabName", "Sedang diproses")
+                startActivity(intent)
+                finish()
+            }
+        val alert = builder.create()
+        alert.show()
     }
 
     private fun submitOrder(paymentType: String) {
@@ -283,10 +300,15 @@ class OrderActivity : AppCompatActivity() {
                     startActivity(intent)
                     finish()
                 }else{
-                    val intent = Intent(this, HistoryActivity::class.java)
-                    intent.putExtra("tabName", "Sedang diproses")
-                    startActivity(intent)
-                    finish()
+                    if (paymentType == "COD" && !switchDelivery.isChecked) {
+                        show24HourLimitPopup()
+                    } else {
+                        val intent = Intent(this, HistoryActivity::class.java)
+                        intent.putExtra("tabName", "Sedang diproses")
+                        startActivity(intent)
+                        finish()
+                    }
+
                 }
 
             }

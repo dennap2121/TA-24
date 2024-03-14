@@ -38,27 +38,20 @@
                 `<View
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_weight="1" />`
+                    android:layout_weight="1" />
 
                 <TextView
-                    android:id="@+id/orderDeliveryTypeTextView"
+                    android:id="@+id/orderCreatedAtTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins"
-                    android:text="Ambil Toko"
-                    android:padding="3dp"
-                    android:textColor="@color/red"
-                    android:background="@drawable/red_border" />
+                    android:textColor="@color/grey_font"
+                    android:text="Tanggal" />
+
+
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/orderCreatedAtTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins"
-                android:textColor="@color/grey_font"
-                android:text="Tanggal" />
 
             <TextView
                 android:id="@+id/orderRejectTextView"
@@ -68,15 +61,6 @@
                 android:textColor="@color/red"
                 android:visibility="gone"
                 android:text="Reject:" />
-
-            <TextView
-                android:id="@+id/orderRejectReasonTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins"
-                android:visibility="gone"
-                android:textColor="@color/red"
-                android:text="-" />
 
             <View
                 android:layout_marginTop="10dp"
@@ -137,9 +121,85 @@
                     android:text="Rp. 210.000" />
             </LinearLayout>
 
+            <View
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="@drawable/dashed_line" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins"
+                    android:id="@+id/orderDetailTextView"
+                    android:textColor="@color/sage_500"
+                    android:text="Lihat Detail" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/orderDeliveryTypeTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins"
+                    android:text="Ambil Toko"
+                    android:paddingHorizontal="50dp"
+                    android:textColor="@color/red"
+                    android:background="@drawable/red_border" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_height="match_parent">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/orderRejectReasonDotTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins"
+                    android:textColor="@color/red"
+                    android:textSize="24dp"
+                    android:visibility="gone"
+                    android:text="•" />
+
+                <TextView
+                    android:id="@+id/orderRejectReasonTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins"
+                    android:textColor="@color/black"
+                    android:visibility="gone"
+                    android:textStyle="italic"
+                    android:text="-" />
+
+            </LinearLayout>
+
+
+
+
+
         </LinearLayout>
 
+
     </LinearLayout>
+
 
 
 

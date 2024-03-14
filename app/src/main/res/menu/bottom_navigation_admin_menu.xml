@@ -5,7 +5,7 @@
         android:icon="@drawable/icon_home" />
     <item
         android:id="@+id/nav_pengiriman"
-        android:title="Pengiriman"
+        android:title="Pemesanan"
         android:icon="@drawable/icon_delivery" />
     <item
         android:id="@+id/nav_transaksi"

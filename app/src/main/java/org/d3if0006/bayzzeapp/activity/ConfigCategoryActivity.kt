@@ -1,6 +1,6 @@
 package org.d3if0006.bayzzeapp.activity
 
-import Product
+import Category
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.ContentValues.TAG
@@ -34,41 +34,32 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import org.d3if0006.bayzzeapp.R
-import org.d3if0006.bayzzeapp.databinding.ActivityConfigProductBinding
+import org.d3if0006.bayzzeapp.databinding.ActivityConfigCategoryBinding
 import java.util.Calendar
 import java.util.UUID
 
-class ConfigProductActivity : AppCompatActivity() {
+class ConfigCategoryActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityConfigProductBinding
-    private lateinit var selectedProducts: MutableList<Product>
+    private lateinit var binding: ActivityConfigCategoryBinding
     private lateinit var layoutDeliveryInfo: LinearLayout
     private lateinit var editName: EditText
-    private lateinit var editQty: EditText
-    private lateinit var editPrice: EditText
-    private lateinit var spinnerCategory: Spinner
     private lateinit var submitButton: Button
     private lateinit var pickImageButton: ImageButton
     private lateinit var imageView: ImageView
-    private lateinit var switchRecommended: Switch
     private lateinit var progressDialog: ProgressDialog // Declare ProgressDialog
     private var selectedImageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityConfigProductBinding.inflate(layoutInflater)
+        binding = ActivityConfigCategoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // Initialize views
         layoutDeliveryInfo = findViewById(R.id.layoutDeliveryInfo)
         editName = findViewById(R.id.editName)
-        editQty = findViewById(R.id.editQty)
-        editPrice = findViewById(R.id.editPrice)
-        spinnerCategory = findViewById(R.id.spinnerCategory)
         submitButton = findViewById(R.id.submitButton)
         pickImageButton = findViewById(R.id.pickImageButton)
         imageView = findViewById(R.id.imageView)
-        switchRecommended = findViewById<Switch>(R.id.switchRecommended)
 
         progressDialog = ProgressDialog(this) // Initialize ProgressDialog
 
@@ -85,51 +76,39 @@ class ConfigProductActivity : AppCompatActivity() {
             submitOrder()
         }
 
-        selectedProducts = intent.getParcelableArrayListExtra<Product>("selectedProducts") ?: mutableListOf()
-
         fetchCategories()
 
         val id = intent.getStringExtra("id")
         if (!id.isNullOrEmpty()) {
-            // Edit product mode
-            fetchProductDetails(id)
+            // Edit category mode
+            fetchCategoryDetails(id)
         }
     }
 
-    private fun fetchProductDetails(productId: String) {
+    private fun fetchCategoryDetails(categoryId: String) {
         val db = FirebaseFirestore.getInstance()
-        db.collection("products").document(productId)
+        db.collection("categories").document(categoryId)
             .get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
-                    val isRecommended = document.getBoolean("isRecommended") ?: false
-                    val product = document.toObject(Product::class.java)
-                    if (product != null) {
-                        // Populate UI fields with the retrieved product details
-                        editName.setText(product.name)
-                        editQty.setText(product.quantity.toString())
-                        editPrice.setText(product.price.toString())
-                        if (spinnerCategory.adapter is ArrayAdapter<*>) {
-                            val categoryIndex = (spinnerCategory.adapter as ArrayAdapter<String>).getPosition(product.category)
-                            spinnerCategory.setSelection(categoryIndex)
-                        }
+                    val category = document.toObject(Category::class.java)
+                    if (category != null) {
+                        // Populate UI fields with the retrieved category details
+                        editName.setText(category.name)
                         Glide.with(this)
-                            .load(product.image)
+                            .load(category.image)
                             .placeholder(R.drawable.background_oval_1) // Optional: Placeholder image while loading
                             .error(R.drawable.background_oval_1) // Optional: Image to display if loading fails
                             .into(pickImageButton)
 
-                        switchRecommended.isChecked = isRecommended
-
-                        // Save the selected image URI
-                        selectedImageUri = Uri.parse(product.image)
+                        selectedImageUri = Uri.parse(category.image)
 
                     }
                 }
             }
             .addOnFailureListener { exception ->
-                Log.w(TAG, "Error fetching product details", exception)
-                Toast.makeText(this, "Failed to fetch product details", Toast.LENGTH_SHORT).show()
+                Log.w(TAG, "Error fetching category details", exception)
+                Toast.makeText(this, "Failed to fetch category details", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -150,7 +129,6 @@ class ConfigProductActivity : AppCompatActivity() {
                 // Populate the spinner with categories
                 val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categoryList)
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                spinnerCategory.adapter = adapter
             }
             .addOnFailureListener { exception ->
                 Log.w(TAG, "Error getting categories", exception)
@@ -160,10 +138,6 @@ class ConfigProductActivity : AppCompatActivity() {
 
     private fun submitOrder() {
         val name = editName.text.toString()
-        val qty = editQty.text.toString().toInt() // Convert quantity to Int
-        val price = editPrice.text.toString().toDouble() // Convert price to Double
-        val category = spinnerCategory.selectedItem.toString()
-        val isRecommended = switchRecommended.isChecked
 
         // Check if an image is selected
         if (selectedImageUri == null) {
@@ -174,19 +148,11 @@ class ConfigProductActivity : AppCompatActivity() {
         // Check if it's an edit operation with no image change
         val id = intent.getStringExtra("id")
         if (!id.isNullOrEmpty() && selectedImageUri.toString() == intent.getStringExtra("previousImage")) {
-            updateProductDetails(name, qty, price, category, isRecommended)
+            updateCategoryDetails(name)
         } else {
-            // Otherwise, proceed with uploading the image and updating product details
-            uploadImageAndProductDetails(name, qty, price, category, isRecommended)
+            // Otherwise, proceed with uploading the image and updating category details
+            uploadImageAndCategoryDetails(name)
         }
-    }
-
-
-    private fun clearProductsSharedPreferences() {
-        val sharedPreferences = getSharedPreferences("products", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.clear() // Clear all data in the SharedPreferences
-        editor.apply()
     }
 
     private fun showLoading() {
@@ -262,33 +228,29 @@ class ConfigProductActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateProductDetails(name: String, qty: Int, price: Double, category: String, isRecommended: Boolean) {
+    private fun updateCategoryDetails(name: String) {
         val id = intent.getStringExtra("id")
         if (id != null) {
             val db = FirebaseFirestore.getInstance()
-            db.collection("products").document(id)
+            db.collection("categories").document(id)
                 .update(
                     "name", name,
-                    "quantity", qty,
-                    "price", price,
-                    "category", category,
-                    "isRecommended", isRecommended,
                     // Add more fields as needed
                 )
                 .addOnSuccessListener {
-                    Log.d(TAG, "Product updated successfully")
-                    Toast.makeText(this, "Product updated successfully", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, ManageProductActivity::class.java))
+                    Log.d(TAG, "Category updated successfully")
+                    Toast.makeText(this, "Category updated successfully", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, ManageCategoryActivity::class.java))
                     finish()
                 }
                 .addOnFailureListener { e ->
-                    Log.w(TAG, "Error updating product", e)
-                    Toast.makeText(this, "Failed to update product", Toast.LENGTH_SHORT).show()
+                    Log.w(TAG, "Error updating category", e)
+                    Toast.makeText(this, "Failed to update category", Toast.LENGTH_SHORT).show()
                 }
         }
     }
 
-    private fun uploadImageAndProductDetails(name: String, qty: Int, price: Double, category: String, isRecommended: Boolean) {
+    private fun uploadImageAndCategoryDetails(name: String) {
         // Create a reference to Firebase Storage
         val storageRef = FirebaseStorage.getInstance().reference
 
@@ -316,51 +278,43 @@ class ConfigProductActivity : AppCompatActivity() {
                 // Check if it's an update operation
                 val id = intent.getStringExtra("id")
                 if (!id.isNullOrEmpty()) {
-                    // Update existing product
-                    db.collection("products").document(id)
+                    // Update existing category
+                    db.collection("categories").document(id)
                         .update(
                             "name", name,
-                            "quantity", qty,
-                            "price", price,
-                            "category", category,
                             "image", imageUrl.toString(),
-                            "isRecommended", isRecommended,
                         )
                         .addOnSuccessListener {
-                            Log.d(TAG, "Product updated successfully")
-                            Toast.makeText(this, "Product updated successfully", Toast.LENGTH_SHORT).show()
+                            Log.d(TAG, "Category updated successfully")
+                            Toast.makeText(this, "Category updated successfully", Toast.LENGTH_SHORT).show()
                             hideLoading()
-                            finish() // Finish the activity after updating the product
+                            finish() // Finish the activity after updating the category
                         }
                         .addOnFailureListener { e ->
-                            Log.w(TAG, "Error updating product", e)
-                            Toast.makeText(this, "Failed to update product", Toast.LENGTH_SHORT).show()
+                            Log.w(TAG, "Error updating category", e)
+                            Toast.makeText(this, "Failed to update category", Toast.LENGTH_SHORT).show()
                             hideLoading()
                         }
                 } else {
-                    // Add new product
-                    val product = hashMapOf(
+                    // Add new category
+                    val category = hashMapOf(
                         "name" to name,
-                        "quantity" to qty,
-                        "price" to price,
-                        "category" to category,
-                        "isRecommended" to isRecommended,
                         "image" to imageUrl.toString() // Store the image URL
                         // Add more fields as needed
                     )
 
-                    // Add the product to the "products" collection in Firestore
-                    db.collection("products")
-                        .add(product)
+                    // Add the category to the "categories" collection in Firestore
+                    db.collection("categories")
+                        .add(category)
                         .addOnSuccessListener { documentReference ->
-                            Log.d(TAG, "Product added with ID: ${documentReference.id}")
-                            Toast.makeText(this, "Product added successfully!", Toast.LENGTH_SHORT).show()
+                            Log.d(TAG, "Category added with ID: ${documentReference.id}")
+                            Toast.makeText(this, "Category added successfully!", Toast.LENGTH_SHORT).show()
                             hideLoading()
-                            finish() // Finish the activity after adding the product
+                            finish() // Finish the activity after adding the category
                         }
                         .addOnFailureListener { e ->
-                            Log.w(TAG, "Error adding product", e)
-                            Toast.makeText(this, "Failed to add product", Toast.LENGTH_SHORT).show()
+                            Log.w(TAG, "Error adding category", e)
+                            Toast.makeText(this, "Failed to add category", Toast.LENGTH_SHORT).show()
                             hideLoading()
                         }
                 }
@@ -375,8 +329,9 @@ class ConfigProductActivity : AppCompatActivity() {
     companion object {
         const val PICK_IMAGE_REQUEST = 1
         const val TAKE_PHOTO_REQUEST = 2
-        private const val TAG = "ConfigProductActivity"
+        private const val TAG = "ConfigCategoryActivity"
     }
+
 }
 
 

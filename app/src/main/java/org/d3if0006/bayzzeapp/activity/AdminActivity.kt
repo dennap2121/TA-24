@@ -34,6 +34,7 @@ import com.denzcoskun.imageslider.ImageSlider
 import com.denzcoskun.imageslider.constants.ScaleTypes
 import com.denzcoskun.imageslider.models.SlideModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -123,11 +124,22 @@ class AdminActivity : AppCompatActivity() {
             popup.show()
         }
 
+        binding.pemasukanBulan.setOnClickListener {
+            val intent = Intent(this, ReportActivity::class.java)
+            startActivity(intent)
+        }
+
+
+        binding.penjualanBulan.setOnClickListener{
+            val intent = Intent( this, ReportActivity::class.java)
+            startActivity(intent)
+        }
+
         val ulasanButton = findViewById<TextView>(R.id.ulasanSemua)
         ulasanButton.setOnClickListener {
-            val Intent = Intent( this, ReviewActivity::class.java)
-            intent.putExtra("isAdmin", true)
-            startActivity(Intent)
+            val intent = Intent( this, ReviewActivity::class.java)
+            intent.putExtra("isAdmin", "admin")
+            startActivity(intent)
         }
 
         val kategoriButton = findViewById<ImageView>(R.id.kategoriSemua)
@@ -168,8 +180,8 @@ class AdminActivity : AppCompatActivity() {
 
         val ordersRef = firestore.collection("orders")
         val todayOrdersQuery = ordersRef
-//            .whereGreaterThanOrEqualTo("createdAt", today)
             .whereIn("status", listOf("Selesai Pembayaran", "Proses Pengiriman", "Selesai"))
+            .orderBy("createdAt", Query.Direction.DESCENDING)
 
         todayOrdersQuery.get()
             .addOnSuccessListener { documents ->
@@ -208,6 +220,42 @@ class AdminActivity : AppCompatActivity() {
             }
             .addOnFailureListener { exception ->
                 Log.e("AdminActivity", "Error getting today's orders", exception)
+            }
+
+        val currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1 // Month starts from 0, so add 1
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+
+        val currentMonthOrdersQuery = ordersRef
+            .whereIn("status", listOf("Selesai Pembayaran", "Proses Pengiriman", "Selesai"))
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { documents ->
+                var numberOfOrders = 0
+                var totalRevenue = 0.0
+
+                val calendar = Calendar.getInstance()
+
+                documents.forEach { document ->
+                    val createdAt = document["createdAt"] as Timestamp
+                    calendar.time = createdAt.toDate()
+
+                    val orderMonth = calendar.get(Calendar.MONTH) + 1 // Month starts from 0, so add 1
+                    val orderYear = calendar.get(Calendar.YEAR)
+
+                    if (orderYear == currentYear && orderMonth == currentMonth) {
+                        totalRevenue += (document["total"] as Double?) ?: 0.0
+                        numberOfOrders++
+                    }
+                }
+
+                val formattedRevenue = NumberFormat.getCurrencyInstance(Locale("id", "ID")).format(totalRevenue)
+                val valuePemasukanBulan = findViewById<TextView>(R.id.valuePemasukanBulan)
+                val valuePenjualanBulan = findViewById<TextView>(R.id.valuePenjualanBulan)
+                valuePemasukanBulan.text = formattedRevenue.replace(",00", "")
+                valuePenjualanBulan.text = numberOfOrders.toString()
+            }
+            .addOnFailureListener { exception ->
+                Log.e("AdminActivity", "Error getting current month's orders", exception)
             }
     }
 
@@ -300,7 +348,7 @@ class AdminActivity : AppCompatActivity() {
         showLoading()
         val db = FirebaseFirestore.getInstance()
         val query = db.collection("reviews")
-            .orderBy("date", Query.Direction.DESCENDING)
+            .orderBy("date", Query.Direction.ASCENDING)
             .limit(1)
         query.get()
             .addOnSuccessListener { documents ->
@@ -341,7 +389,7 @@ class AdminActivity : AppCompatActivity() {
     }
 
     class ReviewAdapter(
-        private val reviewList: List<Review>,
+        private var reviewList: List<Review>,
         private val context: Context
     ) : RecyclerView.Adapter<ReviewViewHolder>() {
 
@@ -400,12 +448,47 @@ class AdminActivity : AppCompatActivity() {
 
             reviewRef.document(id).update("comments", FieldValue.arrayUnion(newComment))
                 .addOnSuccessListener {
+                    fetchReviewData()
                     Toast.makeText(context, "Comment added successfully", Toast.LENGTH_SHORT).show()
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(context, "Error adding comment", Toast.LENGTH_SHORT).show()
                 }
 
+        }
+
+        private fun fetchReviewData() {
+            val db = FirebaseFirestore.getInstance()
+            val query = db.collection("reviews")
+                .orderBy("date", Query.Direction.ASCENDING)
+                .limit(1)
+            query.get()
+                .addOnSuccessListener { documents ->
+                    var reviewListRaw = mutableListOf<Review>()
+                    for (document in documents) {
+                        val reviewId = document.id
+                        val reviewName = document.getString("name") ?: "-"
+                        val reviewDate = document.getString("date") ?: "01/01/2020"
+                        val reviewReview = document.getString("review") ?: "-"
+                        val reviewComments = document.get("comments") as? List<HashMap<String, String>>
+
+                        val review = Review(
+                            reviewId,
+                            reviewName,
+                            reviewDate,
+                            reviewReview,
+                            reviewComments
+                        )
+                        reviewListRaw.add(review)
+                    }
+
+                    reviewList = reviewListRaw
+
+                    notifyDataSetChanged()
+                }
+                .addOnFailureListener { exception ->
+                    Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                }
         }
 
     }

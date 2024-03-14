@@ -69,6 +69,10 @@ class SettingActivity : AppCompatActivity() {
         binding.toko.setOnClickListener {
             navigateToManageTimeActivity()
         }
+
+        binding.expired.setOnClickListener {
+            navigateToManageExpiredActivity()
+        }
     }
 
     private fun clearLoginDetails() {
@@ -102,6 +106,12 @@ class SettingActivity : AppCompatActivity() {
         val intent = Intent(this, ManageTimeActivity::class.java)
         startActivity(intent)
         finish() // Finish SignInActivity to prevent returning to it when pressing back button from MainActivity
+    }
+
+    private fun navigateToManageExpiredActivity() {
+        val intent = Intent(this, ExpiredActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     private fun navigateToReviewActivity() {

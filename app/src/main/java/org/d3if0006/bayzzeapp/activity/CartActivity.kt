@@ -68,7 +68,7 @@ class CartActivity : AppCompatActivity() {
             binding.emptyCart.visibility = View.VISIBLE
             binding.cartRecyclerView.visibility = View.GONE
             binding.floatingButton.visibility = View.GONE
-            // Set orderNowButton to search activity
+            binding.orderNowButton2.visibility = View.GONE
             binding.orderNowButton.setOnClickListener {
                 val intent = Intent(this, SearchActivity::class.java)
                 intent.putExtra("searchName", "")
@@ -79,6 +79,13 @@ class CartActivity : AppCompatActivity() {
             // Hide the empty cart message and show the RecyclerView
             binding.emptyCart.visibility = View.GONE
             binding.cartRecyclerView.visibility = View.VISIBLE
+            binding.orderNowButton2.visibility = View.VISIBLE
+            binding.orderNowButton2.setOnClickListener {
+                val intent = Intent(this, SearchActivity::class.java)
+                intent.putExtra("searchName", "")
+                startActivity(intent)
+                finish()
+            }
             val adapter = CartProductAdapter(selectedProducts, this::updateToCart, this::deleteProduct)
             cartRecyclerView = findViewById(R.id.cartRecyclerView)
             cartRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -108,6 +115,7 @@ class CartActivity : AppCompatActivity() {
             binding.emptyCart.visibility = View.VISIBLE
             binding.cartRecyclerView.visibility = View.GONE
             binding.floatingButton.visibility = View.GONE
+            binding.orderNowButton2.visibility = View.GONE
             // Set orderNowButton to search activity
             binding.orderNowButton.setOnClickListener {
                 val intent = Intent(this, SearchActivity::class.java)
@@ -119,6 +127,13 @@ class CartActivity : AppCompatActivity() {
             // Hide the empty cart message and show the RecyclerView
             binding.emptyCart.visibility = View.GONE
             binding.cartRecyclerView.visibility = View.VISIBLE
+            binding.orderNowButton2.visibility = View.VISIBLE
+            binding.orderNowButton2.setOnClickListener {
+                val intent = Intent(this, SearchActivity::class.java)
+                intent.putExtra("searchName", "")
+                startActivity(intent)
+                finish()
+            }
             val adapter = CartProductAdapter(selectedProducts, this::updateToCart, this::deleteProduct)
             cartRecyclerView = findViewById(R.id.cartRecyclerView)
             cartRecyclerView.layoutManager = LinearLayoutManager(this)

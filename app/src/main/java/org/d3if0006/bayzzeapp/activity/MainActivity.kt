@@ -2,6 +2,7 @@ package org.d3if0006.bayzzeapp.activity
 
 import Product
 import android.app.ProgressDialog
+import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
@@ -31,7 +32,9 @@ import com.denzcoskun.imageslider.constants.ScaleTypes
 import com.denzcoskun.imageslider.models.SlideModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import org.d3if0006.bayzzeapp.R
 import org.d3if0006.bayzzeapp.databinding.ActivityMainBinding
 
@@ -47,6 +50,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var articleRecyclerView: RecyclerView
     private lateinit var categoryRecyclerView: RecyclerView
     private lateinit var progressDialog: ProgressDialog // Declare ProgressDialog
+    private lateinit var reviewRecyclerView: RecyclerView
+    private lateinit var reviewList: MutableList<Review>
+    private lateinit var username: String
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +90,7 @@ class MainActivity : AppCompatActivity() {
         fetchCategoryData()
         fetchArticleData()
         fetchBannerData()
+        fetchReviewData()
 
         val uid = FirebaseAuth.getInstance().currentUser?.uid
         if (uid != null) {
@@ -90,6 +98,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         imageSlider = findViewById(R.id.image_slider)
+
+        username = ""
 
         val profileActbutton = findViewById<ImageButton>(R.id.profile_act_btn)
         profileActbutton.setOnClickListener {
@@ -106,6 +116,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        binding.reviewSemua.setOnClickListener{
+            val intent = Intent(this, ReviewActivity::class.java)
+            startActivity(intent)
+        }
+
 
         // Initialize RecyclerView
         productRecyclerView = findViewById(R.id.productRecomendRecyclerView)
@@ -114,10 +129,11 @@ class MainActivity : AppCompatActivity() {
         articleRecyclerView = findViewById(R.id.articleRecyclerView)
         articleRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
-
         categoryRecyclerView = findViewById(R.id.categoryRecyclerView)
         categoryRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
+        reviewRecyclerView = findViewById(R.id.reviewRecyclerView)
+        reviewRecyclerView.layoutManager = LinearLayoutManager(this)
 
         setupSearchView()
 
@@ -149,6 +165,8 @@ class MainActivity : AppCompatActivity() {
 
         userInfoRef.get()
             .addOnSuccessListener { document ->
+                username = document.getString("name") ?: ""
+
                 if (!document.exists()) {
                     showProfileCompletionPopup()
                 }
@@ -423,6 +441,167 @@ class MainActivity : AppCompatActivity() {
         val productImageView: ImageView = itemView.findViewById(R.id.imageView)
     }
 
+    private fun fetchReviewData() {
+        showLoading("Ulasan")
+        val db = FirebaseFirestore.getInstance()
+        val query = db.collection("reviews")
+            .orderBy("date", Query.Direction.ASCENDING)
+            .limit(1)
+        query.get()
+            .addOnSuccessListener { documents ->
+                hideLoading()
+                reviewList = mutableListOf()
+                for (document in documents) {
+                    val reviewId = document.id
+                    val reviewName = document.getString("name") ?: "-"
+                    val reviewDate = document.getString("date") ?: "01/01/2020"
+                    val reviewReview = document.getString("review") ?: "-"
+                    val reviewComments = document.get("comments") as? List<HashMap<String, String>>
+
+                    val review = Review(
+                        reviewId,
+                        reviewName,
+                        reviewDate,
+                        reviewReview,
+                        reviewComments
+                    )
+                    reviewList.add(review)
+                }
+                // Call a function to display or process the review list
+                displayReviewList(reviewList)
+                val adapter = ReviewAdapter(
+                    reviewList,
+                    this,
+                    username
+                ) // Pass tabName to adapter
+                reviewRecyclerView.adapter = adapter
+            }
+            .addOnFailureListener { exception ->
+                Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+            }
+    }
+
+
+    private fun displayReviewList(reviewList: List<Review>) {
+        // Implement your logic to display the review list, such as setting up a RecyclerView adapter
+    }
+
+    class ReviewAdapter(
+        private var reviewList: List<Review>,
+        private val context: Context,
+        private val username: String,
+    ) : RecyclerView.Adapter<ReviewViewHolder>() {
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReviewViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_review_card, parent, false)
+            return ReviewViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ReviewViewHolder, position: Int) {
+            val review = reviewList[position]
+
+            holder.reviewNameTextView.text = review.name
+            holder.reviewDateTextView.text = review.date
+            holder.reviewReviewTextView.text = review.review
+
+            val comments = review.comments
+            if (comments != null && comments.isNotEmpty()) {
+                holder.commentAuthorTextView.visibility = View.VISIBLE
+                holder.commentContentTextView.visibility = View.VISIBLE
+                holder.commentAuthorTextView.text = ""
+                holder.commentContentTextView.text = ""
+                for (comment in comments) {
+                    holder.commentAuthorTextView.append(comment["name"] + "\n")
+                    holder.commentContentTextView.append(comment["comment"] + "\n")
+                }
+            } else {
+                // Hide the comment views if there are no comments or comments are null
+                holder.commentAuthorTextView.visibility = View.GONE
+                holder.commentContentTextView.visibility = View.GONE
+            }
+
+            holder.reviewSendIconImageView.setOnClickListener {
+                val commentText = holder.reviewCommentEditText.text.toString().trim()
+
+                if (commentText.isNotEmpty()) {
+                    addCommentToFirestore(review.id, commentText)
+                    holder.reviewCommentEditText.text.clear()
+                } else {
+                    Toast.makeText(context, "Comment cannot be empty", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        override fun getItemCount(): Int {
+            return reviewList.size
+        }
+
+        private fun addCommentToFirestore(id: String, commentText: String) {
+            val db = FirebaseFirestore.getInstance()
+            val reviewRef = db.collection("reviews")
+            val newComment = hashMapOf(
+                "name" to username,
+                "comment" to commentText
+            )
+
+            reviewRef.document(id).update("comments", FieldValue.arrayUnion(newComment))
+                .addOnSuccessListener {
+                    fetchReviewData()
+                    Toast.makeText(context, "Comment added successfully", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(context, "Error adding comment", Toast.LENGTH_SHORT).show()
+                }
+
+        }
+
+        private fun fetchReviewData() {
+            val db = FirebaseFirestore.getInstance()
+            val query = db.collection("reviews")
+                .orderBy("date", Query.Direction.ASCENDING)
+                .limit(1)
+            query.get()
+                .addOnSuccessListener { documents ->
+                    var reviewListRaw = mutableListOf<Review>()
+                    for (document in documents) {
+                        val reviewId = document.id
+                        val reviewName = document.getString("name") ?: "-"
+                        val reviewDate = document.getString("date") ?: "01/01/2020"
+                        val reviewReview = document.getString("review") ?: "-"
+                        val reviewComments = document.get("comments") as? List<HashMap<String, String>>
+
+                        val review = Review(
+                            reviewId,
+                            reviewName,
+                            reviewDate,
+                            reviewReview,
+                            reviewComments
+                        )
+                        reviewListRaw.add(review)
+                    }
+
+                    reviewList = reviewListRaw
+
+                    notifyDataSetChanged()
+                }
+                .addOnFailureListener { exception ->
+                    Log.w(ContentValues.TAG, "Error getting documents: ", exception)
+                }
+        }
+
+    }
+
+    class ReviewViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val reviewNameTextView: TextView = itemView.findViewById(R.id.reviewNameTextView)
+        val reviewDateTextView: TextView = itemView.findViewById(R.id.reviewDateTextView)
+        val reviewCommentEditText: EditText = itemView.findViewById(R.id.reviewCommentEditText)
+        val reviewReviewTextView: TextView = itemView.findViewById(R.id.reviewReviewTextView)
+        val reviewSendIconImageView: ImageButton = itemView.findViewById(R.id.reviewSendIconImageView)
+        val commentAuthorTextView: TextView = itemView.findViewById(R.id.commentAuthorTextView)
+        val commentContentTextView: TextView = itemView.findViewById(R.id.commentContentTextView)
+    }
+
     private fun showLoading(string: String) {
         progressDialog.setMessage("Memuat data ${string}...")
         progressDialog.setCancelable(false)
@@ -433,9 +612,10 @@ class MainActivity : AppCompatActivity() {
         progressDialog.dismiss()
     }
 
-    data class Banner(val image: String) // Example data class, adjust as needed
+    data class Article(val image: String, val link: String)
 
-    data class Article(val image: String, val link: String) // Example data class, adjust as needed
+    data class Category(val name: String, val image: String)
 
-    data class Category(val name: String, val image: String) // Example data class, adjust as needed
+    data class Review(val id: String, val name: String, val date: String, val review: String, val comments: List<HashMap<String, String>>?)
+
 }

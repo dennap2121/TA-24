@@ -46,11 +46,10 @@
 
         <TextView
             android:text="No"
-            android:layout_width="0dp"
+            android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins"
             android:textColor="@color/black"
-            android:layout_weight="1"
             android:textSize="16sp"/>
 
         <TextView
@@ -64,6 +63,15 @@
 
         <TextView
             android:text="Date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins"
+            android:textColor="@color/black"
+            android:layout_weight="1"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:text="Product"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins"

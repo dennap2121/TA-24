@@ -17,6 +17,40 @@
         android:paddingBottom="16dp"/>
 
     <TextView
+        android:id="@+id/textImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gambar Kategori"
+        android:textColor="#32647B"
+        android:fontFamily="@font/poppins"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Add image section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@drawable/default_placeholder"
+            android:contentDescription="Product Image"/>
+
+        <ImageButton
+            android:id="@+id/pickImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_image"
+            android:contentDescription="Pick Image"
+            android:padding="8dp"/>
+
+    </LinearLayout>
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="URL Gambar"

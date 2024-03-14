@@ -21,6 +21,7 @@ import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toolbar
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -38,7 +39,7 @@ import java.util.Date
 class ManageUserActivity : AppCompatActivity() {
 
     private lateinit var userAdapter: UserAdapter
-    private val userList = mutableListOf<User>()
+    private var userList = mutableListOf<User>()
     private val CREATE_DOCUMENT_REQUEST = 123
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +50,7 @@ class ManageUserActivity : AppCompatActivity() {
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewTransactions)
         val export = findViewById<ImageView>(R.id.menu_export)
         val backButton = findViewById<ImageButton>(R.id.backButton)
+        val search = findViewById<SearchView>(R.id.searchView)
 
         export.setOnClickListener{
             exportToCSV()
@@ -59,6 +61,7 @@ class ManageUserActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        search.setQuery("", false)
 
         // Initialize RecyclerView and adapter
         userAdapter = UserAdapter(userList)
@@ -67,25 +70,57 @@ class ManageUserActivity : AppCompatActivity() {
             adapter = userAdapter
         }
 
+        setupSearchView()
+
         // Fetch user data from Firestore
-        fetchUsersFromFirestore()
+        fetchUsersFromFirestore("")
 
     }
 
-    private fun fetchUsersFromFirestore() {
+    private fun setupSearchView() {
+        val search = findViewById<SearchView>(R.id.searchView)
+
+        search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                // Called when the user submits the query by pressing the search button
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // Called when the text in the search view changes
+                // Fetch products based on the new search query
+                fetchUsersFromFirestore(newText.orEmpty())
+                return true
+            }
+        })
+    }
+
+    private fun fetchUsersFromFirestore(search: String) {
         val db = FirebaseFirestore.getInstance()
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewTransactions)
+
         db.collection("user_info")
             .get()
             .addOnSuccessListener { result ->
+                userList = mutableListOf()
                 for (document in result) {
                     val email = document.getString("email") ?: ""
                     val name = document.getString("name") ?: ""
                     val phone = document.getString("phone") ?: ""
+                    if (name?.contains(search, ignoreCase = true) == true) {
+                        Log.d("ggez", search)
+                        userList.add(User(email, name, phone))
+                    }
 
-                    val user = User(email, name, phone)
-                    userList.add(user)
+                }
+                userAdapter = UserAdapter(userList)
+                Log.d("ggez", userList.toString())
+                recyclerView.apply {
+                    layoutManager = LinearLayoutManager(this@ManageUserActivity)
+                    adapter = userAdapter
                 }
                 userAdapter.notifyDataSetChanged()
+
             }
             .addOnFailureListener { exception ->
                 Toast.makeText(this, "Error fetching users", Toast.LENGTH_SHORT).show()

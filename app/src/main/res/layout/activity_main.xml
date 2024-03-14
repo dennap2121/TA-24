@@ -141,6 +141,7 @@
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="16dp"
                         android:text="Lihat Semua >"
+                        android:layout_marginEnd="5dp"
                         android:layout_marginRight="10dp"
                         android:fontFamily="@font/poppins"
                         android:textColor="@color/grey_font"
@@ -148,9 +149,6 @@
                         android:textStyle="bold"/>
 
                 </LinearLayout>
-
-
-
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/categoryRecyclerView"
                     android:layout_width="match_parent"
@@ -171,7 +169,6 @@
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/categoryRecyclerView" />
-
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/productRecomendRecyclerView"
                     android:layout_width="match_parent"
@@ -180,6 +177,55 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView16" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:id="@+id/textViewReview"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/productRecomendRecyclerView"
+                    tools:ignore="MissingConstraints">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="16dp"
+                        android:text="Ulasan"
+                        android:fontFamily="@font/poppins"
+                        android:textColor="@color/sage_muda"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/reviewSemua"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="16dp"
+                        android:text="Lihat Semua >"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginRight="10dp"
+                        android:fontFamily="@font/poppins"
+                        android:textColor="@color/grey_font"
+                        android:textSize="14sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/reviewRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewReview" />
 
                 <TextView
                     android:id="@+id/textView17"
@@ -192,14 +238,16 @@
                     android:textColor="@color/sage_muda"
                     android:textSize="18sp"
                     android:textStyle="bold"
+                    android:visibility="gone"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/productRecomendRecyclerView" />
+                    app:layout_constraintTop_toBottomOf="@+id/reviewRecyclerView" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/articleRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="8dp"
+                    android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView17" />

@@ -1,9 +1,12 @@
 package org.d3if0006.bayzzeapp.activity
 
 import Product
+import android.app.ProgressDialog
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.common.reflect.TypeToken
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import org.d3if0006.bayzzeapp.R
 import org.d3if0006.bayzzeapp.databinding.ActivityListBinding
@@ -26,34 +30,63 @@ class ListActivity : AppCompatActivity() {
     private lateinit var binding: ActivityListBinding
     private lateinit var cartRecyclerView: RecyclerView
     private lateinit var selectedProducts: MutableList<Product>
-
+    private lateinit var categoryList: MutableList<Category>
+    private lateinit var progressDialog: ProgressDialog
+    private lateinit var categoryRecyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        progressDialog = ProgressDialog(this) // Initialize ProgressDialog
+
+
         binding.backButton.setOnClickListener {
             finish()
         }
 
-        val categories = listOf(
-            Category("Coklat", R.drawable.icon_candy),
-            Category("Camilan Manis", R.drawable.icon_cupcake),
-            Category("Camilan Asin", R.drawable.icon_burger),
-            Category("Minuman", R.drawable.icon_drink),
-            Category("Makanan", R.drawable.icon_food)
-        )
+        fetchCategoryData()
 
         val recyclerView = findViewById<RecyclerView>(R.id.listRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        val adapter = CategoryAdapter(categories) { category ->
-            val intent = Intent(this, CategoryActivity::class.java)
-            intent.putExtra("categoryName", category.name)
-            startActivity(intent)
-        }
-        recyclerView.adapter = adapter
+        categoryRecyclerView = findViewById(R.id.listRecyclerView)
+
+    }
+
+    private fun navigateToCategoryActivity(category: Category) {
+        val intent = Intent(this, CategoryActivity::class.java)
+        intent.putExtra("categoryName", category.name)
+        startActivity(intent)
+    }
+
+    private fun fetchCategoryData() {
+        showLoading()
+        val db = FirebaseFirestore.getInstance()
+        db.collection("categories")
+            .get()
+            .addOnSuccessListener { documents ->
+                hideLoading()
+                categoryList = mutableListOf()
+                for (document in documents) {
+                    val categoryImage = document.getString("image")
+                    val categoryName = document.getString("name")
+
+                    categoryList.add(
+                        Category(
+                            categoryName ?: "",
+                            categoryImage ?: ""
+                        )
+                    )
+                }
+                val adapter = CategoryAdapter(categoryList, this::navigateToCategoryActivity)
+
+                categoryRecyclerView.adapter = adapter
+            }
+            .addOnFailureListener { exception ->
+                Log.w(ContentValues.TAG, "Error getting categories: ", exception)
+            }
     }
 
     class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -71,7 +104,13 @@ class ListActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
             val category = categories[position]
             // Bind category data to the ViewHolder
-            holder.imageView.setImageResource(category.imageResource)
+            if (!category.image.isNullOrEmpty()) {
+                Glide.with(holder.itemView.context)
+                    .load(category.image)
+                    .placeholder(R.drawable.product1) // Placeholder image while loading
+                    .error(R.drawable.product2) // Error image if unable to load
+                    .into(holder.imageView)
+            }
             holder.categoryTextView.text = category.name
 
             holder.itemView.setOnClickListener {
@@ -84,7 +123,18 @@ class ListActivity : AppCompatActivity() {
         }
     }
 
-    data class Category(val name: String, val imageResource: Int) // Example data class, adjust as needed
+    private fun showLoading() {
+        progressDialog.setMessage("Tunggu sebentar...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+    }
+
+    private fun hideLoading() {
+        progressDialog.dismiss()
+    }
+
+    data class Category(val name: String, val image: String)
+
 
 }
 

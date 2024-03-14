@@ -149,6 +149,7 @@ class SearchActivity : AppCompatActivity() {
                 // Pass the list of selected products to the cart activity
                 intent.putExtra("selectedProducts", ArrayList(productListCart))
                 startActivity(intent)
+                finish()
             } else {
                 // Show a message indicating that the cart is empty
                 Toast.makeText(this, "No products added to the cart", Toast.LENGTH_SHORT).show()
